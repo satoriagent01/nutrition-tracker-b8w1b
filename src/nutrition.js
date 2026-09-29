@@ -22,7 +22,7 @@ export function calculateNutrition(product, grams) {
     carbs: Math.round(product.per100g.carbs * factor * 10) / 10,
     sugars: Math.round(product.per100g.sugars * factor * 10) / 10,
     protein: Math.round(product.per100g.protein * factor * 10) / 10,
-    salt: Math.round(product.per100g.salt * factor * 100) / 100
+    sodium: Math.round(product.per100g.sodium * factor * 1000) / 1000
   };
 }
 
@@ -39,7 +39,7 @@ export function sumNutrition(items) {
     carbs: 0,
     sugars: 0,
     protein: 0,
-    salt: 0
+    sodium: 0
   };
 
   for (const item of items) {
@@ -50,7 +50,7 @@ export function sumNutrition(items) {
       result.carbs += item.nutrition.carbs || 0;
       result.sugars += item.nutrition.sugars || 0;
       result.protein += item.nutrition.protein || 0;
-      result.salt += item.nutrition.salt || 0;
+      result.sodium += item.nutrition.sodium || 0;
     }
   }
 
@@ -60,8 +60,8 @@ export function sumNutrition(items) {
   result.saturatedFat = Math.round(result.saturatedFat * 10) / 10;
   result.carbs = Math.round(result.carbs * 10) / 10;
   result.sugars = Math.round(result.sugars * 10) / 10;
-  result.protein = Math.round(result.protein * 10) / 10;
-  result.salt = Math.round(result.salt * 100) / 100;
+  result.protein = Math.round(result.protein * 100) / 100;
+  result.sodium = Math.round(result.sodium * 1000) / 1000;
 
   return result;
 }
