@@ -1,6 +1,6 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { saveProduct, getProducts, saveMeal, getMeals } from "../src/storage.js";
+import { saveProduct, getProducts, saveMeal, getMeals, deleteProduct, getMeal } from "../src/storage.js";
 
 describe("storage", () => {
   // Use a mock storage object instead of localStorage
@@ -19,13 +19,15 @@ describe("storage", () => {
     const product = {
       id: "product-1",
       name: "Chocolate Bar",
-      energy: 549,
-      fat: 33,
-      saturatedFat: 13,
-      carbs: 55,
-      sugars: 45,
-      protein: 6.8,
-      sodium: 0.18
+      per100g: {
+        energy: 549,
+        fat: 33,
+        saturatedFat: 13,
+        carbs: 55,
+        sugars: 45,
+        protein: 6.8,
+        sodium: 0.18
+      }
     };
 
     saveProduct(product, mockStorage);
@@ -33,32 +35,36 @@ describe("storage", () => {
 
     assert.equal(products.length, 1);
     assert.equal(products[0].name, "Chocolate Bar");
-    assert.equal(products[0].energy, 549);
+    assert.equal(products[0].per100g.energy, 549);
   });
 
   test("AC-2: stores multiple products", () => {
     const product1 = {
       id: "product-1",
       name: "Chocolate Bar",
-      energy: 549,
-      fat: 33,
-      saturatedFat: 13,
-      carbs: 55,
-      sugars: 45,
-      protein: 6.8,
-      sodium: 0.18
+      per100g: {
+        energy: 549,
+        fat: 33,
+        saturatedFat: 13,
+        carbs: 55,
+        sugars: 45,
+        protein: 6.8,
+        sodium: 0.18
+      }
     };
 
     const product2 = {
       id: "product-2",
       name: "Apple Juice",
-      energy: 47,
-      fat: 0,
-      saturatedFat: 0,
-      carbs: 11,
-      sugars: 10,
-      protein: 0.7,
-      sodium: 0
+      per100g: {
+        energy: 47,
+        fat: 0,
+        saturatedFat: 0,
+        carbs: 11,
+        sugars: 10,
+        protein: 0.7,
+        sodium: 0
+      }
     };
 
     saveProduct(product1, mockStorage);
@@ -76,6 +82,41 @@ describe("storage", () => {
     assert.equal(products.length, 0);
   });
 
+  test("AC-2: updates existing product", () => {
+    const product1 = {
+      id: "product-1",
+      name: "Chocolate Bar",
+      per100g: { energy: 549, fat: 33, saturatedFat: 13, carbs: 55, sugars: 45, protein: 6.8, sodium: 0.18 }
+    };
+
+    const product2 = {
+      id: "product-1",
+      name: "Chocolate Bar",
+      per100g: { energy: 600, fat: 35, saturatedFat: 15, carbs: 50, sugars: 40, protein: 7, sodium: 0.2 }
+    };
+
+    saveProduct(product1, mockStorage);
+    saveProduct(product2, mockStorage);
+    const products = getProducts(mockStorage);
+
+    assert.equal(products.length, 1);
+    assert.equal(products[0].per100g.energy, 600);
+  });
+
+  test("AC-2: deletes a product", () => {
+    const product = {
+      id: "product-1",
+      name: "Chocolate Bar",
+      per100g: { energy: 549, fat: 33, saturatedFat: 13, carbs: 55, sugars: 45, protein: 6.8, sodium: 0.18 }
+    };
+
+    saveProduct(product, mockStorage);
+    deleteProduct("Chocolate Bar", mockStorage);
+    const products = getProducts(mockStorage);
+
+    assert.equal(products.length, 0);
+  });
+
   test("AC-5: saves and retrieves a meal", () => {
     const meal = {
       id: "meal-1",
@@ -85,13 +126,15 @@ describe("storage", () => {
           productId: "product-1",
           productName: "Chocolate Bar",
           grams: 30,
-          energy: 164.7,
-          fat: 9.9,
-          saturatedFat: 3.9,
-          carbs: 16.5,
-          sugars: 13.5,
-          protein: 2.04,
-          sodium: 0.054
+          nutrition: {
+            energy: 164.7,
+            fat: 9.9,
+            saturatedFat: 3.9,
+            carbs: 16.5,
+            sugars: 13.5,
+            protein: 2.04,
+            sodium: 0.054
+          }
         }
       ],
       totalNutrition: {
@@ -142,5 +185,27 @@ describe("storage", () => {
     mockStorage.clear();
     const meals = getMeals(mockStorage);
     assert.equal(meals.length, 0);
+  });
+
+  test("AC-5: retrieves a specific meal by name", () => {
+    const meal = {
+      id: "meal-1",
+      name: "Breakfast",
+      items: [],
+      totalNutrition: { energy: 0, fat: 0, saturatedFat: 0, carbs: 0, sugars: 0, protein: 0, sodium: 0 }
+    };
+
+    saveMeal(meal, mockStorage);
+    const retrievedMeal = getMeal("Breakfast", mockStorage);
+
+    assert.ok(retrievedMeal);
+    assert.equal(retrievedMeal.name, "Breakfast");
+  });
+
+  test("AC-5: returns undefined for non-existent meal", () => {
+    mockStorage.clear();
+    const retrievedMeal = getMeal("NonExistent", mockStorage);
+
+    assert.equal(retrievedMeal, undefined);
   });
 });
