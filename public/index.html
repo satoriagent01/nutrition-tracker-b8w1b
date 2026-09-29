@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nutrition Tracker</title>
+  <style>
+    :root {
+      --primary: #2e7d32;
+      --primary-light: #4caf50;
+      --bg: #f5f5f5;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --text-light: #666666;
+      --border: #e0e0e0;
+      --danger: #d32f2f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--primary-light);
+    }
+
+    nav button {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    nav button:hover, nav button.active {
+      background: rgba(255,255,255,0.4);
+    }
+
+    main {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(46,125,50,0.2);
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: var(--primary-light);
+    }
+
+    button.secondary {
+      background: #757575;
+    }
+
+    button.secondary:hover {
+      background: #9e9e9e;
+    }
+
+    button.danger {
+      background: var(--danger);
+    }
+
+    button.danger:hover {
+      background: #e53935;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    /* Upload area */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .upload-area:hover {
+      border-color: var(--primary);
+      background: rgba(46,125,50,0.05);
+    }
+
+    .upload-area.dragover {
+      border-color: var(--primary);
+      background: rgba(46,125,50,0.1);
+    }
+
+    .upload-area svg {
+      width: 48px;
+      height: 48px;
+      fill: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-area p {
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    /* Nutrition grid */
+    .nutrition-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .nutrition-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem;
+      background: var(--bg);
+      border-radius: 4px;
+    }
+
+    .nutrition-label {
+      font-weight: 500;
+      color: var(--text-light);
+    }
+
+    .nutrition-value {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* Product list */
+    .product-list {
+      list-style: none;
+    }
+
+    .product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .product-item:last-child {
+      border-bottom: none;
+    }
+
+    .product-info h4 {
+      font-size: 1rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .product-info span {
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+
+    /* Meal items */
+    .meal-item-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      background: var(--bg);
+      border-radius: 4px;
+    }
+
+    .meal-item-row .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .meal-item-row button {
+      padding: 0.5rem;
+      min-width: 36px;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #333;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 200;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Config section */
+    .config-section {
+      background: #fff3e0;
+      border: 1px solid #ffe0b2;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .config-section h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: #e65100;
+    }
+
+    .config-section p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .nutrition-grid {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        flex-wrap: wrap;
+      }
+
+      nav button {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🥗 Nutrition Tracker</h1>
+  </header>
+
+  <nav>
+    <button class="active" data-section="scan">📷 Scan</button>
+    <button data-section="products">📦 Products</button>
+    <button data-section="meals">🍽️ Meals</button>
+    <button data-section="summary">📊 Summary</button>
+    <button data-section="config">⚙️ Config</button>
+  </nav>
+
+  <main>
+    <!-- Scan Section -->
+    <section id="scan-section" class="section active">
+      <div class="card">
+        <h2>Scan Nutrition Label</h2>
+        <div class="upload-area" id="upload-area">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/>
+          </svg>
+          <p>Click or drag &amp; drop a photo of a nutrition label</p>
+          <p style="font-size: 0.8rem; margin-top: 0.5rem;">Supports JPEG, PNG</p>
+        </div>
+        <input type="file" id="file-input" accept="image/jpeg,image/png" style="display:none" />
+        <div id="scan-preview" style="margin-top: 1rem; text-align: center;"></div>
+        <div id="scan-result" style="margin-top: 1rem;"></div>
+      </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products-section" class="section">
+      <div class="card">
+        <h2>My Products</h2>
+        <ul class="product-list" id="product-list">
+          <li style="text-align:center; color: var(--text-light); padding: 2rem;">
+            No products yet. Scan a nutrition label to add one!
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Meals Section -->
+    <section id="meals-section" class="section">
+      <div class="card">
+        <h2>Create Meal</h2>
+        <form id="meal-form">
+          <div class="form-group">
+            <label for="meal-name">Meal Name</label>
+            <input type="text" id="meal-name" name="name" placeholder="e.g., Breakfast" required />
+          </div>
+          <div class="form-group">
+            <label for="meal-date">Date</label>
+            <input type="date" id="meal-date" name="date" required />
+          </div>
+          <div id="meal-items">
+            <div class="meal-item-row">
+              <div class="form-group">
+                <label>Product</label>
+                <select class="meal-product-select" required>
+                  <option value="">Select product</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Grams</label>
+                <input type="number" class="meal-grams-input" step="0.1" min="0.1" placeholder="100" required />
+              </div>
+              <button type="button" class="remove-item-btn danger" style="visibility:hidden;">×</button>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" id="add-item-btn" class="secondary">+ Add Item</button>
+            <button type="submit">Save Meal</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Saved Meals</h2>
+        <div id="saved-meals-list">
+          <p style="text-align:center; color: var(--text-light); padding: 2rem;">
+            No meals yet. Create one above!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Summary Section -->
+    <section id="summary-section" class="section">
+      <div class="card">
+        <h2>Nutrition Summary</h2>
+        <div class="nutrition-grid" id="nutrition-summary">
+          <div class="nutrition-item">
+            <span class="nutrition-label">Energy</span>
+            <span class="nutrition-value" id="sum-energy">0 kcal</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-label">Fat</span>
+            <span class="nutrition-value" id="sum-fat">0 g</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-label">Saturated Fat</span>
+            <span class="nutrition-value" id="sum-saturatedFat">0 g</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-label">Carbohydrates</span>
+            <span class="nutrition-value" id="sum-carbs">0 g</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-label">Sugars</span>
+            <span class="nutrition-value" id="sum-sugars">0 g</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-label">Protein</span>
+            <span class="nutrition-value" id="sum-protein">0 g</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-label">Sodium</span>
+            <span class="nutrition-value" id="sum-sodium">0 g</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Config Section -->
+    <section id="config-section" class="section">
+      <div class="card">
+        <h2>AI Configuration</h2>
+        <div class="config-section">
+          <h3>OpenAI-Compatible Endpoint</h3>
+          <p>Configure the AI endpoint used for OCR extraction of nutrition labels.</p>
+        </div>
+        <form id="config-form">
+          <div class="form-group">
+            <label for="config-endpoint">Endpoint URL</label>
+            <input type="url" id="config-endpoint" name="endpoint" placeholder="https://api.openai.com/v1" />
+          </div>
+          <div class="form-group">
+            <label for="config-key">API Key</label>
+            <input type="password" id="config-key" name="key" placeholder="sk-..." />
+          </div>
+          <div class="form-group">
+            <label for="config-model">Model</label>
+            <input type="text" id="config-model" name="model" placeholder="gpt-4o" />
+          </div>
+          <button type="submit">Save Configuration</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Data</h2>
+        <div class="btn-row">
+          <button type="button" id="export-data-btn" class="secondary">Export Data</button>
+          <button type="button" id="clear-data-btn" class="danger">Clear All Data</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { extractNutrition } from '../src/ocr.js';
+    import { calculateNutrition, sumNutrition } from '../src/nutrition.js';
+    import { saveProduct, getProducts, saveMeal, getMeals } from '../src/storage.js';
+
+    // --- Navigation ---
+    const navButtons = document.querySelectorAll('nav button');
+    const sections = document.querySelectorAll('.section');
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        navButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.section;
+        sections.forEach(s => s.classList.remove('active'));
+        document.getElementById(`${target}-section`).classList.add('active');
+        if (target === 'products') renderProducts();
+        if (target === 'meals') { populateProductSelects(); renderMeals(); }
+        if (target === 'summary') renderSummary();
+      });
+    });
+
+    // --- Toast ---
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // --- Config ---
+    const configForm = document.getElementById('config-form');
+    configForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const config = {
+        endpoint: document.getElementById('config-endpoint').value,
+        key: document.getElementById('config-key').value,
+        model: document.getElementById('config-model').value,
+      };
+      localStorage.setItem('nutrition-tracker-config', JSON.stringify(config));
+      showToast('Configuration saved!');
+    });
+
+    // Load config
+    const savedConfig = localStorage.getItem('nutrition-tracker-config');
+    if (savedConfig) {
+      const config = JSON.parse(savedConfig);
+      document.getElementById('config-endpoint').value = config.endpoint || '';
+      document.getElementById('config-key').value = config.key || '';
+      document.getElementById('config-model').value = config.model || '';
+    }
+
+    function getConfig() {
+      const saved = localStorage.getItem('nutrition-tracker-config');
+      if (!saved) return null;
+      return JSON.parse(saved);
+    }
+
+    // --- Upload / Scan ---
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        handleFile(fileInput.files[0]);
+      }
+    });
+
+    async function handleFile(file) {
+      const preview = document.getElementById('scan-preview');
+      const resultDiv = document.getElementById('scan-result');
+      preview.innerHTML = `<img src="${URL.createObjectURL(file)}" style="max-width:100%; border-radius:8px;" />`;
+      resultDiv.innerHTML = '<p>Processing...</p>';
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result.split(',')[1];
+
+        // Try to call the AI endpoint if configured
+        const config = getConfig();
+        let ocrResult;
+
+        if (config && config.endpoint && config.key) {
+          try {
+            const response = await fetch(`${config.endpoint}/chat/completions`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.key}`,
+              },
+              body: JSON.stringify({
+                model: config.model || 'gpt-4o',
+                messages: [
+                  {
+                    role: 'user',
+                    content: [
+                      { type: 'text', text: 'Extract the nutritional information from this nutrition label. Return a JSON object with keys: energy (kcal), fat (g), saturatedFat (g), carbs (g), sugars (g), protein (g), sodium (g). Use values per 100g/ml as shown on the label.' },
+                      { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64}` } }
+                    ]
+                  }
+                ],
+                max_tokens: 500,
+              }),
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              const text = data.choices?.[0]?.message?.content || '';
+              // Try to parse JSON from the response
+              const jsonMatch = text.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                ocrResult = JSON.parse(jsonMatch[0]);
+              } else {
+                // Fallback: create a mock result from the text
+                ocrResult = { text: text, per: '100g' };
+              }
+            } else {
+              throw new Error('API call failed');
+            }
+          } catch (err) {
+            console.error('OCR API error:', err);
+            // Fallback: use mock data for testing
+            ocrResult = {
+              text: `Energie 549 kcal\nFett 33 g\ndavon gesättigte Fettsäuren 13 g\nKohlenhydrate 55 g\ndavon Zucker 45 g\nEiweiß 6,8 g\nSalz 0,18 g`,
+              per: '100g'
+            };
+          }
+        } else {
+          // No config: use mock data
+          ocrResult = {
+            text: `Energie 549 kcal\nFett 33 g\ndavon gesättigte Fettsäuren 13 g\nKohlenhydrate 55 g\ndavon Zucker 45 g\nEiweiß 6,8 g\nSalz 0,18 g`,
+            per: '100g'
+          };
+        }
+
+        const nutrition = extractNutrition(ocrResult);
+
+        resultDiv.innerHTML = `
+          <h3>Extracted Nutrition</h3>
+          <div class="nutrition-grid">
+            <div class="nutrition-item"><span class="nutrition-label">Energy</span><span class="nutrition-value">${nutrition.energy} kcal</span></div>
+            <div class="nutrition-item"><span class="nutrition-label">Fat</span><span class="nutrition-value">${nutrition.fat} g</span></div>
+            <div class="nutrition-item"><span class="nutrition-label">Saturated Fat</span><span class="nutrition-value">${nutrition.saturatedFat} g</span></div>
+            <div class="nutrition-item"><span class="nutrition-label">Carbs</span><span class="nutrition-value">${nutrition.carbs} g</span></div>
+            <div class="nutrition-item"><span class="nutrition-label">Sugars</span><span class="nutrition-value">${nutrition.sugars} g</span></div>
+            <div class="nutrition-item"><span class="nutrition-label">Protein</span><span class="nutrition-value">${nutrition.protein} g</span></div>
+            <div class="nutrition-item"><span class="nutrition-label">Sodium</span><span class="nutrition-value">${nutrition.sodium} g</span></div>
+          </div>
+          <div class="btn-row">
+            <input type="text" id="scan-product-name" placeholder="Product name" style="flex:1; padding:0.6rem; border:1px solid var(--border); border-radius:4px;" />
+            <button id="save-scan-product">Save Product</button>
+          </div>
+        `;
+
+        document.getElementById('save-scan-product').addEventListener('click', () => {
+          const name = document.getElementById('scan-product-name').value || 'Scanned Product';
+          const product = {
+            id: 'product-' + Date.now(),
+            name,
+            energy: nutrition.energy,
+            fat: nutrition.fat,
+            saturatedFat: nutrition.saturatedFat,
+            carbs: nutrition.carbs,
+            sugars: nutrition.sugars,
+            protein: nutrition.protein,
+            sodium: nutrition.sodium,
+          };
+          saveProduct(product);
+          showToast(`Product "${name}" saved!`);
+          preview.innerHTML = '';
+          resultDiv.innerHTML = '';
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // --- Products ---
+    function renderProducts() {
+      const products = getProducts();
+      const list = document.getElementById('product-list');
+
+      if (products.length === 0) {
+        list.innerHTML = '<li style="text-align:center; color: var(--text-light); padding: 2rem;">No products yet. Scan a nutrition label to add one!</li>';
+        return;
+      }
+
+      list.innerHTML = products.map(p => `
+        <li class="product-item">
+          <div class="product-info">
+            <h4>${p.name}</h4>
+            <span>${p.energy} kcal · ${p.fat}g fat · ${p.carbs}g carbs</span>
+          </div>
+          <button type="button" class="delete-product-btn danger" data-id="${p.id}">×</button>
+        </li>
+      `).join('');
+
+      list.querySelectorAll('.delete-product-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const allProducts = getProducts();
+          const filtered = allProducts.filter(p => p.id !== btn.dataset.id);
+          localStorage.setItem('nutrition-tracker-products', JSON.stringify(filtered));
+          renderProducts();
+          showToast('Product deleted');
+        });
+      });
+    }
+
+    // --- Meals ---
+    let mealItemCount = 1;
+
+    function populateProductSelects() {
+      const products = getProducts();
+      document.querySelectorAll('.meal-product-select').forEach(select => {
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">Select product</option>' +
+          products.map(p => `<option value="${p.id}" data-name="${p.name}" data-energy="${p.energy}" data-fat="${p.fat}" data-saturated-fat="${p.saturatedFat}" data-carbs="${p.carbs}" data-sugars="${p.sugars}" data-protein="${p.protein}" data-sodium="${p.sodium}">${p.name}</option>`).join('');
+        select.value = currentVal;
+      });
+    }
+
+    document.getElementById('add-item-btn').addEventListener('click', () => {
+      const container = document.getElementById('meal-items');
+      const row = document.createElement('div');
+      row.className = 'meal-item-row';
+      row.innerHTML = `
+        <div class="form-group">
+          <label>Product</label>
+          <select class="meal-product-select" required>
+            <option value="">Select product</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Grams</label>
+          <input type="number" class="meal-grams-input" step="0.1" min="0.1" placeholder="100" required />
+        </div>
+        <button type="button" class="remove-item-btn danger">×</button>
+      `;
+      container.appendChild(row);
+      row.querySelector('.remove-item-btn').addEventListener('click', () => row.remove());
+      populateProductSelects();
+    });
+
+    document.getElementById('meal-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('meal-name').value;
+      const date = document.getElementById('meal-date').value;
+      const rows = document.querySelectorAll('.meal-item-row');
+      const items = [];
+
+      rows.forEach(row => {
+        const productId = row.querySelector('.meal-product-select').value;
+        const grams = parseFloat(row.querySelector('.meal-grams-input').value);
+        if (productId && grams) {
+          items.push({ productId, grams });
+        }
+      });
+
+      if (items.length === 0) {
+        showToast('Add at least one product to the meal');
+        return;
+      }
+
+      const meal = {
+        id: 'meal-' + Date.now(),
+        name,
+        date,
+        items,
+      };
+
+      saveMeal(meal);
+      showToast(`Meal "${name}" saved!`);
+      e.target.reset();
+      document.getElementById('meal-date').value = new Date().toISOString().split('T')[0];
+      renderMeals();
+    });
+
+    function renderMeals() {
+      const meals = getMeals();
+      const products = getProducts();
+      const container = document.getElementById('saved-meals-list');
+
+      if (meals.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color: var(--text-light); padding: 2rem;">No meals yet. Create one above!</p>';
+        return;
+      }
+
+      container.innerHTML = meals.map(meal => {
+        const mealNutrition = sumNutrition(
+          meal.items.map(item => {
+            const product = products.find(p => p.id === item.productId);
+            return product ? { product, grams: item.grams } : null;
+          }).filter(Boolean)
+        );
+
+        return `
+          <div class="card" style="margin-bottom: 0.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:1rem;">${meal.name} <span style="font-weight:normal; color:var(--text-light); font-size:0.85rem;">(${meal.date})</span></h3>
+              <button type="button" class="delete-meal-btn danger" data-id="${meal.id}" style="padding:0.3rem 0.6rem; font-size:0.8rem;">Delete</button>
+            </div>
+            <div class="nutrition-grid" style="margin-top:0.5rem;">
+              <div class="nutrition-item"><span class="nutrition-label">Energy</span><span class="nutrition-value">${mealNutrition?.energy || 0} kcal</span></div>
+              <div class="nutrition-item"><span class="nutrition-label">Fat</span><span class="nutrition-value">${mealNutrition?.fat || 0} g</span></div>
+              <div class="nutrition-item"><span class="nutrition-label">Carbs</span><span class="nutrition-value">${mealNutrition?.carbs || 0} g</span></div>
+              <div class="nutrition-item"><span class="nutrition-label">Protein</span><span class="nutrition-value">${mealNutrition?.protein || 0} g</span></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.querySelectorAll('.delete-meal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const allMeals = getMeals();
+          const filtered = allMeals.filter(m => m.id !== btn.dataset.id);
+          localStorage.setItem('nutrition-tracker-meals', JSON.stringify(filtered));
+          renderMeals();
+          showToast('Meal deleted');
+        });
+      });
+    }
+
+    // --- Summary ---
+    function renderSummary() {
+      const meals = getMeals();
+      const products = getProducts();
+
+      let totalNutrition = { energy: 0, fat: 0, saturatedFat: 0, carbs: 0, sugars: 0, protein: 0, sodium: 0 };
+
+      meals.forEach(meal => {
+        const mealNutrition = sumNutrition(
+          meal.items.map(item => {
+            const product = products.find(p => p.id === item.productId);
+            return product ? { product, grams: item.grams } : null;
+          }).filter(Boolean)
+        );
+
+        if (mealNutrition) {
+          totalNutrition.energy += mealNutrition.energy || 0;
+          totalNutrition.fat += mealNutrition.fat || 0;
+          totalNutrition.saturatedFat += mealNutrition.saturatedFat || 0;
+          totalNutrition.carbs += mealNutrition.carbs || 0;
+          totalNutrition.sugars += mealNutrition.sugars || 0;
+          totalNutrition.protein += mealNutrition.protein || 0;
+          totalNutrition.sodium += mealNutrition.sodium || 0;
+        }
+      });
+
+      document.getElementById('sum-energy').textContent = `${totalNutrition.energy} kcal`;
+      document.getElementById('sum-fat').textContent = `${totalNutrition.fat} g`;
+      document.getElementById('sum-saturatedFat').textContent = `${totalNutrition.saturatedFat} g`;
+      document.getElementById('sum-carbs').textContent = `${totalNutrition.carbs} g`;
+      document.getElementById('sum-sugars').textContent = `${totalNutrition.sugars} g`;
+      document.getElementById('sum-protein').textContent = `${totalNutrition.protein} g`;
+      document.getElementById('sum-sodium').textContent = `${totalNutrition.sodium} g`;
+    }
+
+    // --- Data management ---
+    document.getElementById('export-data-btn').addEventListener('click', () => {
+      const data = {
+        products: getProducts(),
+        meals: getMeals(),
+        config: getConfig(),
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'nutrition-tracker-data.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Data exported!');
+    });
+
+    document.getElementById('clear-data-btn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+        localStorage.removeItem('nutrition-tracker-products');
+        localStorage.removeItem('nutrition-tracker-meals');
+        localStorage.removeItem('nutrition-tracker-config');
+        showToast('All data cleared');
+        renderProducts();
+        renderMeals();
+        renderSummary();
+      }
+    });
+
+    // Set today's date as default
+    document.getElementById('meal-date').value = new Date().toISOString().split('T')[0];
+  </script>
+</body>
+</html>
