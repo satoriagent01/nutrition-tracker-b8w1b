@@ -1,35 +1,33 @@
 /**
- * Nutrition calculation and aggregation module.
+ * Nutrition calculation module.
+ * Provides functions to scale nutritional values and aggregate data.
  */
 
 /**
  * Scales per-100g nutritional values to the specified gram amount.
- * @param {object} product - Product with per100g nutritional data
- * @param {number} grams - Amount in grams
- * @returns {object} Scaled nutritional data
+ *
+ * @param {Object} product - Product with per-100g nutritional values
+ * @param {number} grams - Amount in grams to scale to
+ * @returns {Object} Scaled nutritional values
  */
 export function calculateNutrition(product, grams) {
-  if (grams < 0) {
-    throw new Error('Grams cannot be negative');
-  }
-
   const factor = grams / 100;
-
   return {
-    energy: Math.round(product.per100g.energy * factor * 1000) / 1000,
-    fat: Math.round(product.per100g.fat * factor * 1000) / 1000,
-    saturatedFat: Math.round(product.per100g.saturatedFat * factor * 1000) / 1000,
-    carbs: Math.round(product.per100g.carbs * factor * 1000) / 1000,
-    sugars: Math.round(product.per100g.sugars * factor * 1000) / 1000,
-    protein: Math.round(product.per100g.protein * factor * 1000) / 1000,
-    sodium: Math.round(product.per100g.sodium * factor * 1000) / 1000
+    energy: Math.round(product.energy * factor * 100) / 100,
+    fat: Math.round(product.fat * factor * 100) / 100,
+    saturatedFat: Math.round(product.saturatedFat * factor * 100) / 100,
+    carbs: Math.round(product.carbs * factor * 100) / 100,
+    sugars: Math.round(product.sugars * factor * 100) / 100,
+    protein: Math.round(product.protein * factor * 100) / 100,
+    sodium: Math.round(product.sodium * factor * 100) / 100
   };
 }
 
 /**
  * Aggregates nutritional data across an array of food items.
- * @param {Array<object>} items - Array of food items with nutrition data
- * @returns {object} Aggregated nutritional data
+ *
+ * @param {Array} items - Array of food items with nutritional data
+ * @returns {Object} Aggregated nutritional values
  */
 export function sumNutrition(items) {
   const result = {
@@ -54,14 +52,10 @@ export function sumNutrition(items) {
     }
   }
 
-  // Round to 3 decimal places
-  result.energy = Math.round(result.energy * 1000) / 1000;
-  result.fat = Math.round(result.fat * 1000) / 1000;
-  result.saturatedFat = Math.round(result.saturatedFat * 1000) / 1000;
-  result.carbs = Math.round(result.carbs * 1000) / 1000;
-  result.sugars = Math.round(result.sugars * 1000) / 1000;
-  result.protein = Math.round(result.protein * 1000) / 1000;
-  result.sodium = Math.round(result.sodium * 1000) / 1000;
+  // Round all values to 2 decimal places
+  for (const key of Object.keys(result)) {
+    result[key] = Math.round(result[key] * 100) / 100;
+  }
 
   return result;
 }
