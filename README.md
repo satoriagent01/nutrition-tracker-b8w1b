@@ -1,85 +1,108 @@
 # Nutrition Tracker
 
-A free, ad-free nutrition tracker web application that lets you scan product nutrition labels with your camera, extract nutritional information using AI-powered OCR, and create custom meal plans to track your intake.
+A web-based nutrition tracking application that allows you to:
+
+- **Scan nutrition labels** using OCR (AI-powered image recognition)
+- **Manually add products** with nutritional information
+- **Track meals** by adding products with specific gram amounts
+- **View nutrition summaries** aggregated across all meals
+- **Export/Import data** for backup and transfer
 
 ## Features
 
-- **📷 Photo Scan**: Take or upload photos of nutrition labels from product packaging
-- **🤖 AI-Powered OCR**: Automatically extracts nutritional data (calories, fats, carbs, sugars, protein, sodium) from images
-- **📦 Product Management**: Save and manage your food products with their nutritional profiles
-- **🍽️ Meal Planning**: Create custom meal plans by specifying grams of each product
-- **📊 Nutrition Tracking**: View total nutritional intake across your meals
-- **🌍 Multi-language**: Handles nutrition labels in Dutch, German, French, Italian, English, and Spanish
-- **💾 Local Storage**: All data stored locally in your browser — no accounts or cloud needed
+- OCR-based nutrition label scanning (AI-powered)
+- Manual product entry with full nutritional data
+- Meal planning with gram-based portion scaling
+- Aggregated nutrition summaries
+- Data export/import functionality
+- Responsive design
 
 ## How to Run
 
-No build step required. Simply serve the `public/` directory with any static file server:
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd nutrition-tracker-b8w1b
+   ```
 
-```bash
-# Using Python
-python3 -m http.server 8080 -d public
+2. Open `public/index.html` in a web browser. You can serve it locally:
+   ```bash
+   # Using Python
+   python -m http.server 8000 -d public
 
-# Using Node.js (with npx)
-npx serve public
+   # Using Node.js with http-server
+   npx http-server public
+   ```
 
-# Using PHP
-php -S localhost:8080 -t public
-```
+3. Open `http://localhost:8000` in your browser.
 
-Then open `http://localhost:8080` in your browser.
+## AI Configuration
 
-## How to Configure the AI Endpoint
+The app uses an OpenAI-compatible API for OCR-based nutrition label scanning.
 
-The app uses an OpenAI-compatible API for OCR extraction. Configure it in the app's **⚙️ Config** tab:
+### Setting up the AI endpoint:
 
-1. **Endpoint URL**: The base URL of your OpenAI-compatible API (e.g., `https://api.openai.com/v1`)
-2. **API Key**: Your API key for authentication
-3. **Model**: The model to use (e.g., `gpt-4o`, `gpt-4-turbo`)
+1. Open the app in your browser
+2. Scroll to the "AI Configuration" section
+3. Enter your API endpoint URL (e.g., `https://api.openai.com/v1/chat/completions`)
+4. Enter your API key
+5. Enter the model name (default: `gpt-4`)
+6. Click "Save Configuration"
 
-The app sends the photo as a base64-encoded image to the `/chat/completions` endpoint with a prompt asking for structured nutritional data.
+**⚠️ Security Warning:** Your API key will be stored in the browser's localStorage. This is convenient but not secure — anyone with access to your browser on this device can view your API key. For production use, consider implementing a backend proxy that stores the key server-side.
 
-### Example Configuration
+### OCR Prompt
 
-```
-Endpoint: https://api.openai.com/v1
-API Key: sk-...
-Model: gpt-4o
-```
+The OCR module sends the image data to the configured AI endpoint with a prompt asking it to extract nutritional information in a structured format. The response is parsed to extract:
 
-If no configuration is provided, the app uses mock data for demonstration purposes.
+- Energy (kcal)
+- Fat (g)
+- Saturated Fat (g)
+- Carbohydrates (g)
+- Sugars (g)
+- Protein (g)
+- Sodium (mg)
 
 ## How to Test
+
+Run the test suite with:
 
 ```bash
 npm test
 ```
 
-The test suite covers:
+The tests cover:
 
-- **OCR extraction**: Parsing nutritional values from OCR text responses
-- **Nutrition calculation**: Scaling per-100g values to custom gram amounts
-- **Nutrition summation**: Aggregating nutritional data across multiple meal items
-- **Product storage**: Saving and retrieving products from localStorage
-- **Meal storage**: Saving and retrieving meals from localStorage
+- OCR extraction (with mock data)
+- Nutrition calculation and scaling
+- Nutrition aggregation across multiple items
+- Storage persistence (save, retrieve, delete)
+- UI rendering functions
 
-## What's Not Done Yet
+## Data Storage
 
-- **Barcode scanning**: No support for scanning barcodes to look up products from databases
-- **Nutrient database**: No built-in database of common products — all products must be scanned manually
-- **Dietary goals**: No predefined diet plans (weight loss, heart health, etc.) — this is intentional per the spec
-- **Cloud sync**: All data is stored locally; no account or sync functionality
-- **Offline support**: No service worker for offline use
-- **Multiple languages for UI**: The interface is in English only (though OCR handles multilingual labels)
-- **Data validation**: No server-side validation (client-side only)
+All data is stored in the browser's localStorage:
 
-## Tech Stack
+- `nutrition_products` — Array of saved products
+- `nutrition_meals` — Array of saved meals
+- `nutrition_api_url` — AI endpoint URL
+- `nutrition_api_key` — AI API key
+- `nutrition_api_model` — AI model name
 
-- **Node 24** with ES modules
-- **No build step** — plain JavaScript
-- **No dependencies** — uses only native browser APIs and Node.js modules
-- **localStorage** for data persistence
-- **OpenAI-compatible API** for OCR (configurable)
+## Import/Export Data
+
+Use the "Export Data" button to download all your data as a JSON file. Use the "Import Data" button to restore data from a previously exported JSON file.
+
+## Not Done Yet
+
+- **Real OCR integration**: The current implementation uses a mock/simulated OCR response. A real implementation would require a working AI API key and endpoint.
+- **User authentication**: No login system — data is stored locally per browser.
+- **Cloud sync**: No cloud backup or sync functionality.
+- **Mobile app**: This is a web app only; no native mobile support.
+- **Nutritional guidelines**: No daily recommended intake tracking or alerts.
+- **Barcode scanning**: No barcode scanning support.
+- **Recipe management**: No recipe creation or management features.
+- **Multi-language OCR**: OCR accuracy depends on the AI model's ability to read nutrition labels in various languages.
 
 ## License
 
