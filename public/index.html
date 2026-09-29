@@ -5,381 +5,491 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nutrition Tracker</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      background-color: #f5f5f5;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #2c3e50;
-    }
-
-    h2 {
-      margin-bottom: 15px;
-      color: #34495e;
-    }
-
-    h3 {
-      margin-bottom: 10px;
-      color: #7f8c8d;
-    }
-
-    .form-section {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    input[type="url"],
-    input[type="password"],
-    input[type="file"],
-    select {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: #3498db;
-      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-    }
-
-    button {
-      background-color: #3498db;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-right: 10px;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      background-color: #2980b9;
-    }
-
-    button:disabled {
-      background-color: #bdc3c7;
-      cursor: not-allowed;
-    }
-
-    .delete-product-btn,
-    .delete-meal-btn {
-      background-color: #e74c3c;
-      padding: 4px 10px;
-      font-size: 12px;
-      margin-left: 10px;
-    }
-
-    .delete-product-btn:hover,
-    .delete-meal-btn:hover {
-      background-color: #c0392b;
-    }
-
-    .nutrition-summary {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-
-    th {
-      background-color: #f8f9fa;
-      font-weight: 600;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    li {
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .ocr-result {
-      margin-top: 15px;
-      padding: 10px;
-      background: #f8f9fa;
-      border-radius: 4px;
-      min-height: 50px;
-    }
-
-    .loading-indicator {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 20px;
-      color: #7f8c8d;
-    }
-
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    #ocr-upload-area {
-      margin-top: 10px;
-    }
-
-    .data-management {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 30px; color: #2c3e50; }
+    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .card h2 { margin-bottom: 15px; color: #34495e; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; margin-bottom: 4px; font-weight: 500; }
+    .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    button { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 8px; margin-top: 8px; }
+    button:hover { background: #2980b9; }
+    button.danger { background: #e74c3c; }
+    button.danger:hover { background: #c0392b; }
+    button.secondary { background: #95a5a6; }
+    button.secondary:hover { background: #7f8c8d; }
+    .product-item, .meal-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .meal-item-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .meal-item-row select, .meal-item-row input { flex: 1; }
+    .remove-item-btn { background: #e74c3c; padding: 8px 12px; }
+    #loading-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
+    #loading-overlay.active { display: flex; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #ddd; border-top-color: #3498db; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-overlay p { margin-top: 15px; font-size: 16px; color: #666; }
+    .nutrition-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 10px; }
+    .nutrition-item { background: #f8f9fa; padding: 10px; border-radius: 4px; text-align: center; }
+    .nutrition-item .value { font-size: 20px; font-weight: bold; color: #2c3e50; }
+    .nutrition-item .label { font-size: 12px; color: #7f8c8d; }
+    .api-config { margin-bottom: 20px; }
+    .api-config .form-group { display: inline-block; width: 30%; margin-right: 10px; }
+    .api-config .form-group:last-child { width: auto; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+    .tab { padding: 10px 20px; background: #ddd; border: none; border-radius: 4px 4px 0 0; cursor: pointer; }
+    .tab.active { background: white; font-weight: bold; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .photo-upload { border: 2px dashed #ddd; padding: 20px; text-align: center; border-radius: 4px; margin-bottom: 15px; cursor: pointer; }
+    .photo-upload:hover { border-color: #3498db; }
+    #ocr-result { margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px; display: none; }
+    #ocr-result.visible { display: block; }
+    .data-actions { margin-top: 15px; }
   </style>
 </head>
 <body>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <p>Processing OCR...</p>
+  </div>
+
   <div class="container">
     <h1>Nutrition Tracker</h1>
 
-    <!-- OCR Upload Section -->
-    <div id="ocr-section"></div>
+    <div class="card api-config">
+      <h2>AI Configuration</h2>
+      <div class="form-group">
+        <label for="api-url">API URL</label>
+        <input type="text" id="api-url" placeholder="https://api.openai.com/v1">
+      </div>
+      <div class="form-group">
+        <label for="api-key">API Key</label>
+        <input type="password" id="api-key" placeholder="sk-...">
+      </div>
+      <div class="form-group">
+        <label for="api-model">Model</label>
+        <input type="text" id="api-model" placeholder="gpt-4o-mini" value="gpt-4o-mini">
+      </div>
+      <button id="save-api-config">Save Configuration</button>
+    </div>
 
-    <!-- API Configuration -->
-    <div id="api-config-section"></div>
+    <div class="tabs">
+      <button class="tab active" data-tab="products">Products</button>
+      <button class="tab" data-tab="meals">Meals</button>
+      <button class="tab" data-tab="summary">Summary</button>
+    </div>
 
-    <!-- Product Form -->
-    <div id="product-form-section"></div>
+    <div id="tab-products" class="tab-content active">
+      <div class="card">
+        <h2>Scan Nutrition Label</h2>
+        <div class="photo-upload" id="photo-upload">
+          <p>Click or drag an image here to scan</p>
+          <input type="file" id="photo-input" accept="image/*" style="display:none">
+        </div>
+        <button id="scan-btn" class="secondary">Scan Image</button>
+        <div id="ocr-result"></div>
+      </div>
 
-    <!-- Products List -->
-    <div id="products-section"></div>
+      <div class="card">
+        <h2>Products</h2>
+        <div id="products-list"></div>
+        <div class="data-actions">
+          <button id="export-btn">Export Data</button>
+          <button id="import-btn">Import Data</button>
+          <input type="file" id="import-file" accept=".json" style="display:none">
+        </div>
+      </div>
 
-    <!-- Meal Planner -->
-    <div id="meal-section"></div>
+      <div class="card">
+        <h2>Add Product</h2>
+        <form id="product-form">
+          <div class="form-group">
+            <label for="product-name">Product Name</label>
+            <input type="text" id="product-name" required>
+          </div>
+          <div class="form-group">
+            <label for="product-energy">Energy (kcal/100g)</label>
+            <input type="number" id="product-energy" min="0" step="0.1" required>
+          </div>
+          <div class="form-group">
+            <label for="product-fat">Fat (g/100g)</label>
+            <input type="number" id="product-fat" min="0" step="0.1" required>
+          </div>
+          <div class="form-group">
+            <label for="product-saturated-fat">Saturated Fat (g/100g)</label>
+            <input type="number" id="product-saturated-fat" min="0" step="0.1" required>
+          </div>
+          <div class="form-group">
+            <label for="product-carbs">Carbs (g/100g)</label>
+            <input type="number" id="product-carbs" min="0" step="0.1" required>
+          </div>
+          <div class="form-group">
+            <label for="product-sugars">Sugars (g/100g)</label>
+            <input type="number" id="product-sugars" min="0" step="0.1" required>
+          </div>
+          <div class="form-group">
+            <label for="product-protein">Protein (g/100g)</label>
+            <input type="number" id="product-protein" min="0" step="0.1" required>
+          </div>
+          <div class="form-group">
+            <label for="product-salt">Salt (g/100g)</label>
+            <input type="number" id="product-salt" min="0" step="0.01" required>
+          </div>
+          <button type="submit">Add Product</button>
+        </form>
+      </div>
+    </div>
 
-    <!-- Nutrition Summary -->
-    <div id="nutrition-section"></div>
+    <div id="tab-meals" class="tab-content">
+      <div class="card">
+        <h2>Meal Planner</h2>
+        <form id="meal-form">
+          <div class="form-group">
+            <label for="meal-name">Meal Name</label>
+            <input type="text" id="meal-name" required>
+          </div>
+          <div class="form-group">
+            <label for="meal-date">Date</label>
+            <input type="date" id="meal-date" required>
+          </div>
+          <div id="meal-items">
+            <div class="meal-item-row">
+              <select class="product-select" required>
+                <option value="">Select Product</option>
+              </select>
+              <input type="number" class="grams-input" placeholder="Grams" min="0" step="1" required>
+              <button type="button" class="remove-item-btn" style="display:none;">×</button>
+            </div>
+          </div>
+          <button type="button" id="add-item-btn">+ Add Item</button>
+          <button type="submit">Save Meal</button>
+        </form>
+        <div id="meals-list"></div>
+      </div>
+    </div>
 
-    <!-- Meals List -->
-    <div id="meals-section"></div>
-
-    <!-- Data Management -->
-    <div id="data-section"></div>
+    <div id="tab-summary" class="tab-content">
+      <div class="card">
+        <h2>Nutrition Summary</h2>
+        <div id="nutrition-summary">
+          <p>Select a meal to view its nutrition summary.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module">
     import { extractNutrition } from './src/ocr.js';
     import { calculateNutrition, sumNutrition } from './src/nutrition.js';
-    import { saveProduct, getProducts, saveMeal, getMeals, deleteProduct, deleteMeal, exportData, importData } from './src/storage.js';
-    import { renderProductForm, renderMealPlanner, renderNutritionSummary, renderOcrUpload, renderApiConfig, renderDataManagement, renderProductsList, renderMealsList, initUI } from './src/ui.js';
+    import { saveProduct, getProducts, saveMeal, getMeals, deleteProduct, deleteMeal, exportData, importData, clearData } from './src/storage.js';
 
     // State
-    let apiConfig = {
-      url: localStorage.getItem('nutrition_api_url') || '',
-      key: localStorage.getItem('nutrition_api_key') || '',
-      model: localStorage.getItem('nutrition_api_model') || 'gpt-4'
-    };
+    let products = [];
+    let meals = [];
+    let pendingOcrData = null;
 
-    let currentNutrition = null;
+    // DOM elements
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const photoInput = document.getElementById('photo-input');
+    const photoUpload = document.getElementById('photo-upload');
+    const scanBtn = document.getElementById('scan-btn');
+    const ocrResult = document.getElementById('ocr-result');
+    const productForm = document.getElementById('product-form');
+    const productsList = document.getElementById('products-list');
+    const mealForm = document.getElementById('meal-form');
+    const mealItems = document.getElementById('meal-items');
+    const addItemBtn = document.getElementById('add-item-btn');
+    const mealsList = document.getElementById('meals-list');
+    const nutritionSummary = document.getElementById('nutrition-summary');
+    const exportBtn = document.getElementById('export-btn');
+    const importBtn = document.getElementById('import-btn');
+    const importFile = document.getElementById('import-file');
+    const saveApiConfigBtn = document.getElementById('save-api-config');
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-    // Render initial UI
-    document.getElementById('ocr-section').innerHTML = renderOcrUpload();
-    document.getElementById('api-config-section').innerHTML = renderApiConfig();
-    document.getElementById('product-form-section').innerHTML = renderProductForm();
-    document.getElementById('meal-section').innerHTML = renderMealPlanner();
-    document.getElementById('data-section').innerHTML = renderDataManagement();
+    // Load saved config
+    const savedUrl = localStorage.getItem('nutrition_api_url');
+    const savedKey = localStorage.getItem('nutrition_api_key');
+    const savedModel = localStorage.getItem('nutrition_api_model');
+    if (savedUrl) document.getElementById('api-url').value = savedUrl;
+    if (savedKey) document.getElementById('api-key').value = savedKey;
+    if (savedModel) document.getElementById('api-model').value = savedModel;
 
-    // Populate API config form
-    const apiUrlInput = document.getElementById('api-url');
-    const apiKeyInput = document.getElementById('api-key');
-    const apiModelInput = document.getElementById('api-model');
-    if (apiUrlInput) apiUrlInput.value = apiConfig.url;
-    if (apiKeyInput) apiKeyInput.value = apiConfig.key;
-    if (apiModelInput) apiModelInput.value = apiConfig.model;
+    // Tab switching
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(tc => tc.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
 
-    // Render products list
-    function renderProducts() {
-      const products = getProducts();
-      document.getElementById('products-section').innerHTML = renderProductsList(products);
-
-      // Update product select in meal form
-      const productSelect = document.getElementById('meal-product');
-      if (productSelect) {
-        const currentValue = productSelect.value;
-        productSelect.innerHTML = '<option value="">Select a product</option>';
-        for (const product of products) {
-          const option = document.createElement('option');
-          option.value = product.name;
-          option.textContent = product.name;
-          productSelect.appendChild(option);
-        }
-        productSelect.value = currentValue;
+    // Photo upload
+    photoUpload.addEventListener('click', () => photoInput.click());
+    photoInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        processOcr(e.target.files[0]);
       }
-    }
+    });
 
-    // Render meals list
-    function renderMeals() {
-      const meals = getMeals();
-      document.getElementById('meals-section').innerHTML = renderMealsList(meals);
-    }
-
-    // Render nutrition summary
-    function renderNutrition() {
-      if (currentNutrition) {
-        document.getElementById('nutrition-section').innerHTML = renderNutritionSummary(currentNutrition);
-      } else {
-        document.getElementById('nutrition-section').innerHTML = '<div class="nutrition-summary"><h2>Nutrition Summary</h2><p>No data yet. Add products or scan a label to see nutrition info.</p></div>';
+    // Drag and drop
+    photoUpload.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      photoUpload.style.borderColor = '#3498db';
+    });
+    photoUpload.addEventListener('dragleave', () => {
+      photoUpload.style.borderColor = '#ddd';
+    });
+    photoUpload.addEventListener('drop', (e) => {
+      e.preventDefault();
+      photoUpload.style.borderColor = '#ddd';
+      if (e.dataTransfer.files.length > 0) {
+        processOcr(e.dataTransfer.files[0]);
       }
-    }
-
-    // Update all lists
-    function updateUI() {
-      renderProducts();
-      renderMeals();
-      renderNutrition();
-    }
+    });
 
     // OCR processing
-    async function processOcr(imageData) {
-      const resultDiv = document.getElementById('ocr-result');
-      if (!resultDiv) return;
+    async function processOcr(file) {
+      const apiUrl = document.getElementById('api-url').value;
+      const apiKey = document.getElementById('api-key').value;
+      const apiModel = document.getElementById('api-model').value;
+
+      const apiConfig = { apiUrl, apiKey, model: apiModel };
+
+      // Show loading indicator
+      loadingOverlay.classList.add('active');
+      ocrResult.classList.remove('visible');
+      ocrResult.innerHTML = '';
 
       try {
-        const nutrition = await extractNutrition(imageData, apiConfig);
-        currentNutrition = nutrition;
+        const base64 = await readFileAsBase64(file);
+        const result = await extractNutrition(base64, apiConfig);
+        pendingOcrData = result;
 
-        // Auto-create product from OCR result if name is available
-        if (nutrition.name) {
-          const products = getProducts();
-          const existing = products.find(p => p.name === nutrition.name);
-          if (!existing) {
-            const product = {
-              name: nutrition.name,
-              per100g: {
-                energy: nutrition.energy || 0,
-                fat: nutrition.fat || 0,
-                saturatedFat: nutrition.saturatedFat || 0,
-                carbs: nutrition.carbs || 0,
-                sugars: nutrition.sugars || 0,
-                protein: nutrition.protein || 0,
-                sodium: nutrition.sodium || 0
-              }
-            };
-            saveProduct(product);
+        ocrResult.innerHTML = `
+          <h3>OCR Result</h3>
+          <p>Energy: ${result.energy} kcal | Fat: ${result.fat}g | Carbs: ${result.carbs}g | Protein: ${result.protein}g | Salt: ${result.salt}g</p>
+          <button id="use-ocr-data">Use This Data</button>
+        `;
+        ocrResult.classList.add('visible');
+
+        document.getElementById('use-ocr-data').addEventListener('click', () => {
+          if (result) {
+            document.getElementById('product-energy').value = result.energy || '';
+            document.getElementById('product-fat').value = result.fat || '';
+            document.getElementById('product-saturated-fat').value = result.saturatedFat || '';
+            document.getElementById('product-carbs').value = result.carbs || '';
+            document.getElementById('product-sugars').value = result.sugars || '';
+            document.getElementById('product-protein').value = result.protein || '';
+            document.getElementById('product-salt').value = result.salt || '';
+            document.getElementById('product-name').focus();
           }
-        }
-
-        resultDiv.innerHTML = `<p>Successfully extracted nutrition data!</p>`;
-        updateUI();
-      } catch (error) {
-        resultDiv.innerHTML = `<p style="color: #e74c3c;">Error: ${error.message}</p>`;
+        });
+      } catch (err) {
+        ocrResult.innerHTML = `<p style="color: #e74c3c;">Error: ${err.message}</p>`;
+        ocrResult.classList.add('visible');
+      } finally {
+        loadingOverlay.classList.remove('active');
       }
     }
 
-    // Product submission handler
-    function handleProductSubmit(product) {
-      saveProduct(product);
-      updateUI();
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
     }
 
-    // Meal submission handler
-    function handleMealSubmit(meal) {
-      const products = getProducts();
-      const product = products.find(p => p.name === meal.product);
+    // Save API config with confirmation
+    saveApiConfigBtn.addEventListener('click', () => {
+      const apiKey = document.getElementById('api-key').value;
+      if (apiKey && !confirm('Are you sure you want to save this API key? It will be stored in localStorage.')) {
+        return;
+      }
+      localStorage.setItem('nutrition_api_url', document.getElementById('api-url').value);
+      localStorage.setItem('nutrition_api_key', apiKey);
+      localStorage.setItem('nutrition_api_model', document.getElementById('api-model').value);
+      alert('Configuration saved!');
+    });
 
-      if (!product) {
-        alert('Product not found. Please add the product first.');
+    // Product form
+    productForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const product = {
+        id: Date.now().toString(),
+        name: document.getElementById('product-name').value,
+        energy: parseFloat(document.getElementById('product-energy').value) || 0,
+        fat: parseFloat(document.getElementById('product-fat').value) || 0,
+        saturatedFat: parseFloat(document.getElementById('product-saturated-fat').value) || 0,
+        carbs: parseFloat(document.getElementById('product-carbs').value) || 0,
+        sugars: parseFloat(document.getElementById('product-sugars').value) || 0,
+        protein: parseFloat(document.getElementById('product-protein').value) || 0,
+        salt: parseFloat(document.getElementById('product-salt').value) || 0
+      };
+
+      saveProduct(product);
+      products.push(product);
+      renderProducts();
+      productForm.reset();
+    });
+
+    // Render products
+    function renderProducts() {
+      products = getProducts();
+      productsList.innerHTML = products.map(p => `
+        <div class="product-item">
+          <span>${p.name} (${p.energy} kcal/100g)</span>
+          <button class="delete-product-btn danger" data-id="${p.id}">Delete</button>
+        </div>
+      `).join('');
+
+      // Delete handlers
+      productsList.querySelectorAll('.delete-product-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          deleteProduct(id);
+          renderProducts();
+          renderMealProductSelects();
+        });
+      });
+    }
+
+    // Meal form
+    mealForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const items = [];
+      const rows = mealItems.querySelectorAll('.meal-item-row');
+      rows.forEach(row => {
+        const productId = row.querySelector('.product-select').value;
+        const grams = parseFloat(row.querySelector('.grams-input').value);
+        if (productId && grams > 0) {
+          items.push({ productId, grams });
+        }
+      });
+
+      if (items.length === 0) {
+        alert('Please add at least one item to the meal.');
         return;
       }
 
-      const nutrition = calculateNutrition(product, meal.grams);
-      const mealEntry = {
-        name: meal.name,
-        product: meal.product,
-        grams: meal.grams,
-        nutrition: nutrition
+      const meal = {
+        id: Date.now().toString(),
+        name: document.getElementById('meal-name').value,
+        date: document.getElementById('meal-date').value,
+        items
       };
 
-      saveMeal(mealEntry);
-      currentNutrition = sumNutrition(getMeals().map(m => m.nutrition));
-      updateUI();
+      saveMeal(meal);
+      meals.push(meal);
+      renderMeals();
+      mealForm.reset();
+      // Reset meal items
+      mealItems.innerHTML = `
+        <div class="meal-item-row">
+          <select class="product-select" required>
+            <option value="">Select Product</option>
+          </select>
+          <input type="number" class="grams-input" placeholder="Grams" min="0" step="1" required>
+          <button type="button" class="remove-item-btn" style="display:none;">×</button>
+        </div>
+      `;
+    });
+
+    // Add meal item row
+    addItemBtn.addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.className = 'meal-item-row';
+      row.innerHTML = `
+        <select class="product-select" required>
+          <option value="">Select Product</option>
+        </select>
+        <input type="number" class="grams-input" placeholder="Grams" min="0" step="1" required>
+        <button type="button" class="remove-item-btn">×</button>
+      `;
+      row.querySelector('.remove-item-btn').addEventListener('click', () => row.remove());
+      mealItems.appendChild(row);
+      renderMealProductSelects();
+    });
+
+    function renderMealProductSelects() {
+      document.querySelectorAll('.product-select').forEach(select => {
+        const currentValue = select.value;
+        select.innerHTML = '<option value="">Select Product</option>';
+        products.forEach(p => {
+          const option = document.createElement('option');
+          option.value = p.id;
+          option.textContent = p.name;
+          select.appendChild(option);
+        });
+        select.value = currentValue;
+      });
     }
 
-    // API config save handler
-    function handleApiConfigSave(config) {
-      apiConfig = config;
-      localStorage.setItem('nutrition_api_url', config.url);
-      localStorage.setItem('nutrition_api_key', config.key);
-      localStorage.setItem('nutrition_api_model', config.model);
-      alert('Configuration saved!');
+    // Render meals
+    function renderMeals() {
+      meals = getMeals();
+      mealsList.innerHTML = meals.map(m => `
+        <div class="meal-item" data-id="${m.id}">
+          <h4>${m.name} (${m.date})</h4>
+          <button class="delete-meal-btn danger" data-id="${m.id}">Delete</button>
+        </div>
+      `).join('');
+
+      mealsList.querySelectorAll('.delete-meal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          deleteMeal(btn.dataset.id);
+          renderMeals();
+        });
+      });
+
+      // Click to view summary
+      mealsList.querySelectorAll('.meal-item').forEach(item => {
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', (e) => {
+          if (e.target.classList.contains('delete-meal-btn')) return;
+          const meal = meals.find(m => m.id === item.dataset.id);
+          if (meal) showMealSummary(meal);
+        });
+      });
     }
 
-    // Delete product handler
-    function handleProductDelete(productName) {
-      deleteProduct(productName);
-      updateUI();
+    function showMealSummary(meal) {
+      const items = meal.items.map(item => {
+        const product = products.find(p => p.id === item.productId);
+        if (!product) return null;
+        const nutrition = calculateNutrition(product, item.grams);
+        return { product: product.name, grams: item.grams, nutrition };
+      }).filter(Boolean);
+
+      const total = sumNutrition(items.map(i => i.nutrition));
+
+      nutritionSummary.innerHTML = `
+        <h3>${meal.name} (${meal.date})</h3>
+        <div class="nutrition-grid">
+          <div class="nutrition-item"><div class="value">${total.energy.toFixed(1)}</div><div class="label">Energy (kcal)</div></div>
+          <div class="nutrition-item"><div class="value">${total.fat.toFixed(1)}</div><div class="label">Fat (g)</div></div>
+          <div class="nutrition-item"><div class="value">${total.saturatedFat.toFixed(1)}</div><div class="label">Saturated Fat (g)</div></div>
+          <div class="nutrition-item"><div class="value">${total.carbs.toFixed(1)}</div><div class="label">Carbs (g)</div></div>
+          <div class="nutrition-item"><div class="value">${total.sugars.toFixed(1)}</div><div class="label">Sugars (g)</div></div>
+          <div class="nutrition-item"><div class="value">${total.protein.toFixed(1)}</div><div class="label">Protein (g)</div></div>
+          <div class="nutrition-item"><div class="value">${total.salt.toFixed(2)}</div><div class="label">Salt (g)</div></div>
+        </div>
+      `;
+
+      // Switch to summary tab
+      tabs.forEach(t => t.classList.remove('active'));
+      tabContents.forEach(tc => tc.classList.remove('active'));
+      document.querySelector('[data-tab="summary"]').classList.add('active');
+      document.getElementById('tab-summary').classList.add('active');
     }
 
-    // Delete meal handler
-    function handleMealDelete(mealName) {
-      deleteMeal(mealName);
-      updateUI();
-    }
-
-    // Export data handler
-    function handleExportData() {
+    // Export/Import
+    exportBtn.addEventListener('click', () => {
       const data = exportData();
       const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -388,41 +498,33 @@
       a.download = 'nutrition-data.json';
       a.click();
       URL.revokeObjectURL(url);
-    }
+    });
 
-    // Import data handler
-    function handleImportData(data) {
-      try {
-        importData(data);
-        updateUI();
-        alert('Data imported successfully!');
-      } catch (error) {
-        alert('Error importing data: ' + error.message);
+    importBtn.addEventListener('click', () => importFile.click());
+    importFile.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            importData(ev.target.result);
+            products = getProducts();
+            meals = getMeals();
+            renderProducts();
+            renderMeals();
+            alert('Data imported successfully!');
+          } catch (err) {
+            alert('Error importing data: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
       }
-    }
-
-    // Product select handler
-    function handleProductSelect(productName) {
-      // Could be used to show preview of product nutrition
-    }
-
-    // Initialize UI
-    initUI({
-      onProductSubmit: handleProductSubmit,
-      onMealSubmit: handleMealSubmit,
-      onOcrProcess: processOcr,
-      onApiConfigSave: handleApiConfigSave,
-      onDeleteProduct: handleProductDelete,
-      onDeleteMeal: handleMealDelete,
-      onExportData: handleExportData,
-      onImportData: handleImportData,
-      onProductSelect: handleProductSelect,
-      onProductDelete: handleProductDelete,
-      onMealDelete: handleMealDelete
     });
 
     // Initial render
-    updateUI();
+    renderProducts();
+    renderMeals();
+    renderMealProductSelects();
   </script>
 </body>
 </html>
