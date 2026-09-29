@@ -1,0 +1,12 @@
+{
+  "name": "nutrition-tracker-b8w1b",
+  "version": "1.0.0",
+  "description": "A free, ad-free nutrition tracker that uses OCR to extract nutritional information from product photos and allows custom meal planning.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
