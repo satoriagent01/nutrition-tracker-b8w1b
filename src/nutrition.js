@@ -16,13 +16,13 @@ export function calculateNutrition(product, grams) {
   const factor = grams / 100;
 
   return {
-    energy: product.per100g.energy * factor,
-    fat: product.per100g.fat * factor,
-    saturatedFat: product.per100g.saturatedFat * factor,
-    carbs: product.per100g.carbs * factor,
-    sugars: product.per100g.sugars * factor,
-    protein: product.per100g.protein * factor,
-    sodium: product.per100g.sodium * factor
+    energy: Math.round(product.per100g.energy * factor * 1000) / 1000,
+    fat: Math.round(product.per100g.fat * factor * 1000) / 1000,
+    saturatedFat: Math.round(product.per100g.saturatedFat * factor * 1000) / 1000,
+    carbs: Math.round(product.per100g.carbs * factor * 1000) / 1000,
+    sugars: Math.round(product.per100g.sugars * factor * 1000) / 1000,
+    protein: Math.round(product.per100g.protein * factor * 1000) / 1000,
+    sodium: Math.round(product.per100g.sodium * factor * 1000) / 1000
   };
 }
 
@@ -53,6 +53,15 @@ export function sumNutrition(items) {
       result.sodium += item.nutrition.sodium || 0;
     }
   }
+
+  // Round to 3 decimal places
+  result.energy = Math.round(result.energy * 1000) / 1000;
+  result.fat = Math.round(result.fat * 1000) / 1000;
+  result.saturatedFat = Math.round(result.saturatedFat * 1000) / 1000;
+  result.carbs = Math.round(result.carbs * 1000) / 1000;
+  result.sugars = Math.round(result.sugars * 1000) / 1000;
+  result.protein = Math.round(result.protein * 1000) / 1000;
+  result.sodium = Math.round(result.sodium * 1000) / 1000;
 
   return result;
 }
