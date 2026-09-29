@@ -11,15 +11,16 @@
  * @returns {Object} Scaled nutritional values
  */
 export function calculateNutrition(product, grams) {
+  const data = product.per100g || product;
   const factor = grams / 100;
   return {
-    energy: Math.round(product.energy * factor * 100) / 100,
-    fat: Math.round(product.fat * factor * 100) / 100,
-    saturatedFat: Math.round(product.saturatedFat * factor * 100) / 100,
-    carbs: Math.round(product.carbs * factor * 100) / 100,
-    sugars: Math.round(product.sugars * factor * 100) / 100,
-    protein: Math.round(product.protein * factor * 100) / 100,
-    sodium: Math.round(product.sodium * factor * 100) / 100
+    energy: Math.round(data.energy * factor * 100) / 100,
+    fat: Math.round(data.fat * factor * 100) / 100,
+    saturatedFat: Math.round(data.saturatedFat * factor * 100) / 100,
+    carbs: Math.round(data.carbs * factor * 100) / 100,
+    sugars: Math.round(data.sugars * factor * 100) / 100,
+    protein: Math.round(data.protein * factor * 100) / 100,
+    sodium: Math.round(data.sodium * factor * 100) / 100
   };
 }
 
