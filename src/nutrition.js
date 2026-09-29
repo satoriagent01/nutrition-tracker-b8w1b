@@ -22,7 +22,7 @@ export function calculateNutrition(product, grams) {
     carbs: Math.round(product.per100g.carbs * factor * 10) / 10,
     sugars: Math.round(product.per100g.sugars * factor * 10) / 10,
     protein: Math.round(product.per100g.protein * factor * 10) / 10,
-    sodium: Math.round(product.per100g.sodium * factor * 1000) / 1000
+    sodium: Math.round(product.per100g.sodium * factor * 10000) / 10000
   };
 }
 
@@ -61,7 +61,7 @@ export function sumNutrition(items) {
   result.carbs = Math.round(result.carbs * 10) / 10;
   result.sugars = Math.round(result.sugars * 10) / 10;
   result.protein = Math.round(result.protein * 100) / 100;
-  result.sodium = Math.round(result.sodium * 1000) / 1000;
+  result.sodium = Math.round(result.sodium * 10000) / 10000;
 
   return result;
 }
