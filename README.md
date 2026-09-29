@@ -1,35 +1,88 @@
 # Nutrition Tracker
 
-A web application for tracking nutrition by scanning food labels with OCR.
+A web-based nutrition tracking application that uses AI-powered OCR to scan food labels and track nutritional intake.
 
 ## Features
 
-- **OCR Scanning**: Upload photos of nutrition labels to automatically extract nutritional data
-- **Product Management**: Manually add products with nutritional information
-- **Meal Planning**: Create meals by combining multiple products with custom serving sizes
-- **Nutrition Summary**: View aggregated nutritional data for any meal
-- **Data Export/Import**: Backup and restore your data as JSON
+- **AI-Powered Label Scanning**: Upload photos of nutrition labels and let AI extract nutritional data automatically
+- **Product Management**: Manually add products with their nutritional information
+- **Meal Planning**: Build meals by combining products with custom serving sizes
+- **Nutrition Summary**: View aggregated nutritional data for your meals
+- **Data Persistence**: All data is saved to localStorage
+- **Data Export/Import**: Backup and restore your data as JSON files
+- **Multi-language OCR**: Supports English, German, Dutch, French, and Italian nutrition labels
 
 ## How to Run
 
-1. Open `public/index.html` in a web browser
-2. Configure your AI endpoint in the "AI Configuration" section:
-   - **API URL**: The base URL of your OpenAI-compatible API (e.g., `https://api.openai.com/v1`)
-   - **API Key**: Your API key (stored in localStorage)
-   - **Model**: The model to use for OCR (default: `gpt-4o-mini`)
-3. Save the configuration and start scanning!
+1. Clone the repository
+2. Open `public/index.html` in a web browser
+3. Configure your AI OCR endpoint (see below)
+4. Start scanning food labels and tracking nutrition!
 
-## AI Configuration
+## AI OCR Configuration
 
-The app uses an OpenAI-compatible API endpoint for OCR. Configure it via the UI:
+The app uses an OpenAI-compatible API for OCR. To configure:
 
-- **API URL**: Must be a valid URL pointing to an OpenAI-compatible endpoint
-- **API Key**: Your API key (saved to localStorage after confirmation)
-- **Model**: The vision model to use (e.g., `gpt-4o-mini`, `gpt-4o`)
+1. Open the app in your browser
+2. Fill in the API configuration section at the top:
+   - **API Key**: Your OpenAI-compatible API key
+   - **API URL**: The base URL of your API endpoint (e.g., `https://api.openai.com/v1`)
+   - **Model**: The model to use (e.g., `gpt-4o-mini`)
+3. Click "Save Configuration"
 
-> **Security Warning**: The API key is stored in localStorage. This is convenient but not secure for production use. In a production environment, the API key should be stored server-side.
+The OCR module sends the image as base64 to the `/chat/completions` endpoint with a prompt asking for nutritional data in JSON format.
 
-## How to Test
+### Supported Languages
+
+The OCR regex supports nutrition labels in:
+- English (sodium, salt)
+- German (Salz)
+- Dutch (zout)
+- French (sel)
+- Italian (sale)
+
+## How to Use
+
+### Scanning a Label
+
+1. Click the photo upload area or drag an image
+2. Click "Scan with AI"
+3. Wait for the AI to process the image
+4. Review the detected nutrition data
+5. Click "Add to Products" to save the product
+
+### Adding Products Manually
+
+1. Fill in the product name and nutritional values
+2. Click "Add Product"
+
+### Creating a Meal
+
+1. Enter a meal name
+2. Select a product from the dropdown
+3. Enter the amount in grams
+4. Click "Add to Meal"
+5. Repeat for additional items
+6. Click "Save Meal"
+
+### Viewing Nutrition Summary
+
+The nutrition summary panel shows the total nutritional values for all items currently in your meal, including:
+- Energy (kcal)
+- Fat (g)
+- Saturated Fat (g)
+- Carbs (g)
+- Sugars (g)
+- Protein (g)
+- Sodium (mg)
+
+### Managing Data
+
+- **Export Data**: Download all your data as a JSON file
+- **Import Data**: Restore data from a JSON file
+- **Clear All Data**: Remove all stored data (with confirmation)
+
+## Testing
 
 Run the tests with:
 
@@ -37,18 +90,26 @@ Run the tests with:
 npm test
 ```
 
-## Architecture
+## Technical Details
 
-- **src/ocr.js**: OCR extraction module that calls the AI API or returns zero-filled data as fallback
-- **src/nutrition.js**: Nutrition calculation (scaling per-100g values) and aggregation
-- **src/storage.js**: localStorage-based persistence with abstraction for testing
-- **src/ui.js**: UI rendering functions (used by tests)
-- **public/index.html**: Main application with all UI logic
+- **Node.js**: 24+ (ES modules)
+- **No build step**: Runs directly in the browser and Node.js
+- **No dependencies**: Pure JavaScript with standard APIs
+- **Storage**: Uses localStorage for persistence
+- **AI Integration**: Uses fetch() to call OpenAI-compatible endpoints
 
-## Not Yet Done
+## What's Not Done Yet
 
-- Real-time meal planning with live nutrition updates
-- Daily/weekly nutrition goals and tracking
-- Barcode scanning support
-- Cloud sync for data backup
-- Mobile app version
+- No actual AI API integration (uses mock data when no API is configured)
+- No server-side component (runs entirely client-side)
+- No user authentication
+- No cloud sync
+- No barcode scanning
+- No recipe management
+- No meal history tracking
+- No nutritional goal setting
+- No mobile app
+
+## License
+
+MIT
