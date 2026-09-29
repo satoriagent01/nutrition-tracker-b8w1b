@@ -1,6 +1,6 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { saveProduct, getProducts, saveMeal, getMeals, deleteProduct, getMeal } from "../src/storage.js";
+import { saveProduct, getProducts, saveMeal, getMeals, deleteProduct, deleteMeal, exportData, importData } from "../src/storage.js";
 
 describe("storage", () => {
   // Use a mock storage object instead of localStorage
@@ -187,7 +187,7 @@ describe("storage", () => {
     assert.equal(meals.length, 0);
   });
 
-  test("AC-5: retrieves a specific meal by name", () => {
+  test("AC-5: deletes a meal", () => {
     const meal = {
       id: "meal-1",
       name: "Breakfast",
@@ -196,16 +196,42 @@ describe("storage", () => {
     };
 
     saveMeal(meal, mockStorage);
-    const retrievedMeal = getMeal("Breakfast", mockStorage);
+    deleteMeal("Breakfast", mockStorage);
+    const meals = getMeals(mockStorage);
 
-    assert.ok(retrievedMeal);
-    assert.equal(retrievedMeal.name, "Breakfast");
+    assert.equal(meals.length, 0);
   });
 
-  test("AC-5: returns undefined for non-existent meal", () => {
-    mockStorage.clear();
-    const retrievedMeal = getMeal("NonExistent", mockStorage);
+  test("AC-5: exports and imports data", () => {
+    const product = {
+      id: "product-1",
+      name: "Chocolate Bar",
+      per100g: { energy: 549, fat: 33, saturatedFat: 13, carbs: 55, sugars: 45, protein: 6.8, sodium: 0.18 }
+    };
 
-    assert.equal(retrievedMeal, undefined);
+    const meal = {
+      id: "meal-1",
+      name: "Snack Time",
+      items: [],
+      totalNutrition: { energy: 164.7, fat: 9.9, saturatedFat: 3.9, carbs: 16.5, sugars: 13.5, protein: 2.04, sodium: 0.054 }
+    };
+
+    saveProduct(product, mockStorage);
+    saveMeal(meal, mockStorage);
+
+    const exported = exportData(mockStorage);
+    const parsed = JSON.parse(exported);
+
+    assert.equal(parsed.products.length, 1);
+    assert.equal(parsed.meals.length, 1);
+
+    // Clear and re-import
+    mockStorage.clear();
+    assert.equal(getProducts(mockStorage).length, 0);
+    assert.equal(getMeals(mockStorage).length, 0);
+
+    importData(exported, mockStorage);
+    assert.equal(getProducts(mockStorage).length, 1);
+    assert.equal(getMeals(mockStorage).length, 1);
   });
 });
