@@ -11,16 +11,16 @@
  * @returns {Object} Scaled nutritional values
  */
 export function calculateNutrition(product, grams) {
-  const data = product.per100g || product;
   const factor = grams / 100;
+  const p = product.per100g || product;
   return {
-    energy: Math.round(data.energy * factor * 100) / 100,
-    fat: Math.round(data.fat * factor * 100) / 100,
-    saturatedFat: Math.round(data.saturatedFat * factor * 100) / 100,
-    carbs: Math.round(data.carbs * factor * 100) / 100,
-    sugars: Math.round(data.sugars * factor * 100) / 100,
-    protein: Math.round(data.protein * factor * 100) / 100,
-    sodium: Math.round(data.sodium * factor * 100) / 100
+    energy: Number(((p.energy || 0) * factor).toFixed(3)),
+    fat: Number(((p.fat || 0) * factor).toFixed(3)),
+    saturatedFat: Number(((p.saturatedFat || 0) * factor).toFixed(3)),
+    carbs: Number(((p.carbs || 0) * factor).toFixed(3)),
+    sugars: Number(((p.sugars || 0) * factor).toFixed(3)),
+    protein: Number(((p.protein || 0) * factor).toFixed(3)),
+    sodium: Number(((p.sodium || 0) * factor).toFixed(3))
   };
 }
 
@@ -42,19 +42,21 @@ export function sumNutrition(items) {
   };
 
   for (const item of items) {
-    const nutrition = item.nutrition || {};
-    result.energy += nutrition.energy || 0;
-    result.fat += nutrition.fat || 0;
-    result.saturatedFat += nutrition.saturatedFat || 0;
-    result.carbs += nutrition.carbs || 0;
-    result.sugars += nutrition.sugars || 0;
-    result.protein += nutrition.protein || 0;
-    result.sodium += nutrition.sodium || 0;
+    const n = item.nutrition || item;
+    if (n) {
+      result.energy += n.energy || 0;
+      result.fat += n.fat || 0;
+      result.saturatedFat += n.saturatedFat || 0;
+      result.carbs += n.carbs || 0;
+      result.sugars += n.sugars || 0;
+      result.protein += n.protein || 0;
+      result.sodium += n.sodium || 0;
+    }
   }
 
-  // Round all values to 2 decimal places
+  // Round all values to 3 decimal places to preserve precision
   for (const key of Object.keys(result)) {
-    result[key] = Math.round(result[key] * 100) / 100;
+    result[key] = Number(result[key].toFixed(3));
   }
 
   return result;
