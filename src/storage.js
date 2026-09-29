@@ -12,13 +12,18 @@ const STORAGE_KEYS = {
 };
 
 /**
- * Saves a product to storage.
+ * Saves a product to storage. Updates if ID already exists.
  * @param {Object} product - The product to save.
  * @param {Object} storage - Storage object (defaults to localStorage).
  */
 export function saveProduct(product, storage = localStorage) {
-  const products = getProducts(storage);
-  products.push(product);
+  let products = getProducts(storage);
+  const idx = products.findIndex(p => p.id === product.id);
+  if (idx >= 0) {
+    products[idx] = product;
+  } else {
+    products.push(product);
+  }
   storage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
 }
 
