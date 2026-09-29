@@ -122,17 +122,17 @@ function parseOcrText(text) {
       continue;
     }
 
-    // Fat
-    const fatMatch = trimmed.match(/(?:fat|lipids?)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*g/i);
-    if (fatMatch) {
-      result.fat = parseFloat(fatMatch[1]);
-      continue;
-    }
-
-    // Saturated Fat
+    // Saturated Fat - must be checked BEFORE regular fat
     const satFatMatch = trimmed.match(/(?:saturated\s*fat|saturated\s?fett)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*g/i);
     if (satFatMatch) {
       result.saturatedFat = parseFloat(satFatMatch[1]);
+      continue;
+    }
+
+    // Fat (total) - only match if not saturated fat
+    const fatMatch = trimmed.match(/^(?:fat|lipids?)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*g/i);
+    if (fatMatch) {
+      result.fat = parseFloat(fatMatch[1]);
       continue;
     }
 
