@@ -15,13 +15,13 @@
 export function calculateNutrition(product, grams) {
   const factor = grams / 100;
   return {
-    energy: Math.round(product.energy * factor * 100) / 100,
-    fat: Math.round(product.fat * factor * 100) / 100,
-    saturatedFat: Math.round(product.saturatedFat * factor * 100) / 100,
-    carbs: Math.round(product.carbs * factor * 100) / 100,
-    sugars: Math.round(product.sugars * factor * 100) / 100,
-    protein: Math.round(product.protein * factor * 100) / 100,
-    sodium: Math.round(product.sodium * factor * 100) / 100,
+    energy: product.energy * factor,
+    fat: product.fat * factor,
+    saturatedFat: product.saturatedFat * factor,
+    carbs: product.carbs * factor,
+    sugars: product.sugars * factor,
+    protein: product.protein * factor,
+    sodium: product.sodium * factor,
   };
 }
 
@@ -51,11 +51,6 @@ export function sumNutrition(items) {
     totals.sugars += item.sugars || 0;
     totals.protein += item.protein || 0;
     totals.sodium += item.sodium || 0;
-  }
-
-  // Round all values to 2 decimal places
-  for (const key of Object.keys(totals)) {
-    totals[key] = Math.round(totals[key] * 100) / 100;
   }
 
   return totals;
