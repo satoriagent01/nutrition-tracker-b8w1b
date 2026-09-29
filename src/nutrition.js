@@ -11,14 +11,15 @@
  */
 export function calculateNutrition(product, grams) {
   const factor = grams / 100;
+  const per100g = product.per100g || {};
   return {
-    energy: round(product.energy * factor, 2),
-    fat: round(product.fat * factor, 2),
-    saturatedFat: round(product.saturatedFat * factor, 2),
-    carbs: round(product.carbs * factor, 2),
-    sugars: round(product.sugars * factor, 2),
-    protein: round(product.protein * factor, 2),
-    sodium: round(product.sodium * factor, 3)
+    energy: round(per100g.energy || 0, 2),
+    fat: round(per100g.fat || 0, 2),
+    saturatedFat: round(per100g.saturatedFat || 0, 2),
+    carbs: round(per100g.carbs || 0, 2),
+    sugars: round(per100g.sugars || 0, 2),
+    protein: round(per100g.protein || 0, 2),
+    sodium: round(per100g.sodium || 0, 3)
   };
 }
 
@@ -63,10 +64,10 @@ export function sumNutrition(items) {
 }
 
 /**
- * Rounds a number to the specified decimal places.
- * @param {number} num - The number to round.
- * @param {number} decimals - Number of decimal places.
- * @returns {number} The rounded number.
+ * Rounds a number to specified decimal places.
+ * @param {number} num - Number to round.
+ * @param {number} decimals - Decimal places.
+ * @returns {number} Rounded number.
  */
 function round(num, decimals) {
   const factor = Math.pow(10, decimals);
