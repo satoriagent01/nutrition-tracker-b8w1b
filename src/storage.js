@@ -15,7 +15,7 @@ const MEALS_KEY = 'nutrition_tracker_meals';
 export function saveProduct(product, storage = globalThis.localStorage) {
   if (!storage) return;
   const products = getProducts(storage);
-  const existingIndex = products.findIndex(p => p.id === product.id);
+  const existingIndex = products.findIndex(p => p.name === product.name);
   if (existingIndex >= 0) {
     products[existingIndex] = product;
   } else {
@@ -43,7 +43,7 @@ export function getProducts(storage = globalThis.localStorage) {
 export function saveMeal(meal, storage = globalThis.localStorage) {
   if (!storage) return;
   const meals = getMeals(storage);
-  const existingIndex = meals.findIndex(m => m.id === meal.id);
+  const existingIndex = meals.findIndex(m => m.name === meal.name);
   if (existingIndex >= 0) {
     meals[existingIndex] = meal;
   } else {
@@ -64,26 +64,26 @@ export function getMeals(storage = globalThis.localStorage) {
 }
 
 /**
- * Deletes a product by ID.
- * @param {string} productId - Product ID to delete
+ * Deletes a product by name.
+ * @param {string} productName - Product name to delete
  * @param {object} [storage] - Storage object (default: localStorage)
  */
-export function deleteProduct(productId, storage = globalThis.localStorage) {
+export function deleteProduct(productName, storage = globalThis.localStorage) {
   if (!storage) return;
   const products = getProducts(storage);
-  const filtered = products.filter(p => p.id !== productId);
+  const filtered = products.filter(p => p.name !== productName);
   storage.setItem(PRODUCTS_KEY, JSON.stringify(filtered));
 }
 
 /**
- * Deletes a meal by ID.
- * @param {string} mealId - Meal ID to delete
+ * Deletes a meal by name.
+ * @param {string} mealName - Meal name to delete
  * @param {object} [storage] - Storage object (default: localStorage)
  */
-export function deleteMeal(mealId, storage = globalThis.localStorage) {
+export function deleteMeal(mealName, storage = globalThis.localStorage) {
   if (!storage) return;
   const meals = getMeals(storage);
-  const filtered = meals.filter(m => m.id !== mealId);
+  const filtered = meals.filter(m => m.name !== mealName);
   storage.setItem(MEALS_KEY, JSON.stringify(filtered));
 }
 
