@@ -6,13 +6,15 @@ describe("calculateNutrition", () => {
   test("AC-3: calculates nutrition for 100g of a product", () => {
     const product = {
       name: "Chocolate Bar",
-      energy: 549,
-      fat: 33,
-      saturatedFat: 13,
-      carbs: 55,
-      sugars: 45,
-      protein: 6.8,
-      sodium: 0.18
+      per100g: {
+        energy: 549,
+        fat: 33,
+        saturatedFat: 13,
+        carbs: 55,
+        sugars: 45,
+        protein: 6.8,
+        sodium: 0.18
+      }
     };
 
     const result = calculateNutrition(product, 100);
@@ -29,13 +31,15 @@ describe("calculateNutrition", () => {
   test("AC-3: calculates nutrition for 30g of a product", () => {
     const product = {
       name: "Chocolate Bar",
-      energy: 549,
-      fat: 33,
-      saturatedFat: 13,
-      carbs: 55,
-      sugars: 45,
-      protein: 6.8,
-      sodium: 0.18
+      per100g: {
+        energy: 549,
+        fat: 33,
+        saturatedFat: 13,
+        carbs: 55,
+        sugars: 45,
+        protein: 6.8,
+        sodium: 0.18
+      }
     };
 
     const result = calculateNutrition(product, 30);
@@ -52,13 +56,15 @@ describe("calculateNutrition", () => {
   test("AC-3: calculates nutrition for 200ml of juice (per 100ml)", () => {
     const product = {
       name: "Apple Juice",
-      energy: 47,
-      fat: 0,
-      saturatedFat: 0,
-      carbs: 11,
-      sugars: 10,
-      protein: 0.7,
-      sodium: 0
+      per100g: {
+        energy: 47,
+        fat: 0,
+        saturatedFat: 0,
+        carbs: 11,
+        sugars: 10,
+        protein: 0.7,
+        sodium: 0
+      }
     };
 
     const result = calculateNutrition(product, 200);
@@ -78,23 +84,27 @@ describe("sumNutrition", () => {
     const items = [
       {
         name: "Chocolate Bar (30g)",
-        energy: 164.7,
-        fat: 9.9,
-        saturatedFat: 3.9,
-        carbs: 16.5,
-        sugars: 13.5,
-        protein: 2.04,
-        sodium: 0.054
+        nutrition: {
+          energy: 164.7,
+          fat: 9.9,
+          saturatedFat: 3.9,
+          carbs: 16.5,
+          sugars: 13.5,
+          protein: 2.04,
+          sodium: 0.054
+        }
       },
       {
         name: "Apple Juice (200ml)",
-        energy: 94,
-        fat: 0,
-        saturatedFat: 0,
-        carbs: 22,
-        sugars: 20,
-        protein: 1.4,
-        sodium: 0
+        nutrition: {
+          energy: 94,
+          fat: 0,
+          saturatedFat: 0,
+          carbs: 22,
+          sugars: 20,
+          protein: 1.4,
+          sodium: 0
+        }
       }
     ];
 
@@ -113,13 +123,15 @@ describe("sumNutrition", () => {
     const items = [
       {
         name: "Olive Oil (20g)",
-        energy: 180,
-        fat: 20,
-        saturatedFat: 3,
-        carbs: 0,
-        sugars: 0,
-        protein: 0,
-        sodium: 0
+        nutrition: {
+          energy: 180,
+          fat: 20,
+          saturatedFat: 3,
+          carbs: 0,
+          sugars: 0,
+          protein: 0,
+          sodium: 0
+        }
       }
     ];
 
