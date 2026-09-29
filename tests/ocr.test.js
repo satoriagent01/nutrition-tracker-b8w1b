@@ -4,7 +4,8 @@ import { extractNutrition } from "../src/ocr.js";
 
 describe("extractNutrition", () => {
   test("AC-1: extracts energy, fat, carbs, sugars, protein, sodium from a sample OCR response", () => {
-    const sampleOcrResponse = "Energy: 549 kcal\nFat: 33 g\nSaturated Fat: 13 g\nCarbohydrates: 55 g\nSugars: 45 g\nProtein: 6.8 g\nSodium: 0.18 g";
+    const sampleOcrResponse =
+      "Nährwertdeklaration\nEnergie: 549 kcal\nFett: 33 g\ndavon gesättigte Fettsäuren: 13 g\nKohlenhydrate: 55 g\ndavon Zucker: 45 g\nEiweiß: 6,8 g\nSalz: 0,18 g";
 
     const result = extractNutrition(sampleOcrResponse);
 
@@ -18,7 +19,7 @@ describe("extractNutrition", () => {
   });
 
   test("AC-1: handles missing values gracefully", () => {
-    const sampleOcrResponse = "Energy: 47 kcal\nCarbohydrates: 11 g";
+    const sampleOcrResponse = "Energie: 47 kcal\nKohlenhydrate: 11 g";
 
     const result = extractNutrition(sampleOcrResponse);
 
@@ -32,7 +33,8 @@ describe("extractNutrition", () => {
   });
 
   test("AC-1: parses kcal value correctly", () => {
-    const sampleOcrResponse = "Energy: 165 kcal\nFat: 10 g\nCarbohydrates: 16 g\nSugars: 14 g\nProtein: 2.0 g\nSodium: 0.05 g";
+    const sampleOcrResponse =
+      "Energie: 165 kcal\nFett: 10 g\nKohlenhydrate: 16 g\ndavon Zucker: 14 g\nEiweiß: 2,0 g\nSalz: 0,05 g";
 
     const result = extractNutrition(sampleOcrResponse);
 
