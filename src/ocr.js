@@ -56,80 +56,32 @@ async function callAIOcr(imageData, apiConfig) {
   });
 
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    throw new Error(`API request failed: ${response.status}`);
   }
 
   const data = await response.json();
   const content = data.choices?.[0]?.message?.content || '';
 
-  // Extract JSON from the response
-  const jsonMatch = content.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    return JSON.parse(jsonMatch[0]);
+  try {
+    // Try to extract JSON from the response
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      return {
+        energy: parseFloat(parsed.energy) || 0,
+        fat: parseFloat(parsed.fat) || 0,
+        saturatedFat: parseFloat(parsed.saturatedFat) || 0,
+        carbs: parseFloat(parsed.carbs) || 0,
+        sugars: parseFloat(parsed.sugars) || 0,
+        protein: parseFloat(parsed.protein) || 0,
+        sodium: parseFloat(parsed.sodium) || 0
+      };
+    }
+  } catch (e) {
+    // Fall through to zero-filled data
   }
 
-  // If no JSON found, return zero-filled data
-  return createZeroFilledNutrition();
-}
-
-/**
- * Parses OCR text to extract nutritional values.
- * @param {string} text - OCR text
- * @returns {object} Nutrition data
- */
-function parseOcrText(text) {
-  const result = createZeroFilledNutrition();
-
-  // Parse energy (kcal)
-  const energyMatch = text.match(/(?:Energie|Energy|Energie|Energie|Energie)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:kcal|kJ|Calories)/i);
-  if (energyMatch) {
-    result.energy = parseFloat(energyMatch[1].replace(',', '.')) || 0;
-  }
-
-  // Parse fat
-  const fatMatch = text.match(/(?:Fett|Fat|Vet|Lipid|Lipidi)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:g|gram)/i);
-  if (fatMatch) {
-    result.fat = parseFloat(fatMatch[1].replace(',', '.')) || 0;
-  }
-
-  // Parse saturated fat
-  const satFatMatch = text.match(/(?:Sättigende\s+Fettsäuren|Saturated\s+Fat|Saturated\s+Fett|Saturated\s+Fett|Saturated\s+Fett|Satureerde\s+vetzuren|Acides\s+gras\s+saturés)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:g|gram)/i);
-  if (satFatMatch) {
-    result.saturatedFat = parseFloat(satFatMatch[1].replace(',', '.')) || 0;
-  }
-
-  // Parse carbs
-  const carbsMatch = text.match(/(?:Kohlenhydrate|Carbohydrate|Koolhydraten|Glucides|Carboidrati)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:g|gram)/i);
-  if (carbsMatch) {
-    result.carbs = parseFloat(carbsMatch[1].replace(',', '.')) || 0;
-  }
-
-  // Parse sugars
-  const sugarsMatch = text.match(/(?:davon\s+Zucker|of\s+which\s+sugars|waarvan\s+suikers|dont\s+sucre|di\s+zuccheri|Sugar|Sugars)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:g|gram)?/i);
-  if (sugarsMatch) {
-    result.sugars = parseFloat(sugarsMatch[1].replace(',', '.')) || 0;
-  }
-
-  // Parse protein
-  const proteinMatch = text.match(/(?:Eiweiß|Eiweiss|Protein|Proteins|Eiwit|Protéine|Proteine)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:g|gram)/i);
-  if (proteinMatch) {
-    result.protein = parseFloat(proteinMatch[1].replace(',', '.')) || 0;
-  }
-
-  // Parse sodium
-  const sodiumMatch = text.match(/(?:Sodium|Salz|Sel|Zout|Sale)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:g|gram)?/i);
-  if (sodiumMatch) {
-    result.sodium = parseFloat(sodiumMatch[1].replace(',', '.')) || 0;
-  }
-
-  return result;
-}
-
-/**
- * Creates a zero-filled nutrition object.
- * @returns {object} Zero-filled nutrition data
- */
-function createZeroFilledNutrition() {
+  // Return zero-filled data if parsing fails
   return {
     energy: 0,
     fat: 0,
@@ -139,4 +91,85 @@ function createZeroFilledNutrition() {
     protein: 0,
     sodium: 0
   };
+}
+
+/**
+ * Parses OCR text to extract nutrition values.
+ * @param {string} text - OCR text
+ * @returns {object} Nutrition data
+ */
+function parseOcrText(text) {
+  const result = {
+    energy: 0,
+    fat: 0,
+    saturatedFat: 0,
+    carbs: 0,
+    sugars: 0,
+    protein: 0,
+    sodium: 0
+  };
+
+  // Parse each line for nutrition values
+  const lines = text.split('\n');
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // Energy / Calories
+    const energyMatch = trimmed.match(/(?:energy|calories)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*kcal/i);
+    if (energyMatch) {
+      result.energy = parseFloat(energyMatch[1]);
+      continue;
+    }
+
+    // Fat
+    const fatMatch = trimmed.match(/(?:fat|lipids?)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*g/i);
+    if (fatMatch) {
+      result.fat = parseFloat(fatMatch[1]);
+      continue;
+    }
+
+    // Saturated Fat
+    const satFatMatch = trimmed.match(/(?:saturated\s*fat|saturated\s?fett)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*g/i);
+    if (satFatMatch) {
+      result.saturatedFat = parseFloat(satFatMatch[1]);
+      continue;
+    }
+
+    // Carbohydrates
+    const carbsMatch = trimmed.match(/(?:carbohydrate|carbohydrates|kohlehydrat|koolhydraat)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*g/i);
+    if (carbsMatch) {
+      result.carbs = parseFloat(carbsMatch[1]);
+      continue;
+    }
+
+    // Sugars - must come before sugar to match "Sugars" first
+    const sugarsMatch = trimmed.match(/(?:sugars?|suiker|zucker|sucre)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*g/i);
+    if (sugarsMatch) {
+      result.sugars = parseFloat(sugarsMatch[1]);
+      continue;
+    }
+
+    // Protein
+    const proteinMatch = trimmed.match(/(?:protein|eiweiss|eiwit|proteine)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*g/i);
+    if (proteinMatch) {
+      result.protein = parseFloat(proteinMatch[1]);
+      continue;
+    }
+
+    // Sodium / Salt
+    const sodiumMatch = trimmed.match(/(?:sodium|salz|sel|zout|sale)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*(?:g|mg)/i);
+    if (sodiumMatch) {
+      const value = parseFloat(sodiumMatch[1]);
+      // If it's in mg, convert to g
+      if (trimmed.toLowerCase().includes('mg')) {
+        result.sodium = value / 1000;
+      } else {
+        result.sodium = value;
+      }
+      continue;
+    }
+  }
+
+  return result;
 }
