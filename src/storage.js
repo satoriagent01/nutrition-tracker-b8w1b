@@ -15,7 +15,7 @@ const MEALS_KEY = 'nutrition_tracker_meals';
 export function saveProduct(product, storage = globalThis.localStorage) {
   if (!storage) return;
   const products = getProducts(storage);
-  const existingIndex = products.findIndex(p => p.name === product.name);
+  const existingIndex = products.findIndex(p => p.id === product.id);
   if (existingIndex >= 0) {
     products[existingIndex] = product;
   } else {
@@ -43,7 +43,7 @@ export function getProducts(storage = globalThis.localStorage) {
 export function saveMeal(meal, storage = globalThis.localStorage) {
   if (!storage) return;
   const meals = getMeals(storage);
-  const existingIndex = meals.findIndex(m => m.name === meal.name);
+  const existingIndex = meals.findIndex(m => m.id === meal.id);
   if (existingIndex >= 0) {
     meals[existingIndex] = meal;
   } else {
