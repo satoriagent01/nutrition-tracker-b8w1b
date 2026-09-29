@@ -7,7 +7,7 @@
  * Extracts nutrition data from OCR text.
  * @param {string} ocrResponse - OCR text response (or imageData if apiConfig provided)
  * @param {object} [apiConfig] - Optional API configuration { url, key, model }
- * @returns {object} Nutrition data with keys: energy, fat, saturatedFat, carbs, sugars, protein, salt
+ * @returns {object} Nutrition data with keys: energy, fat, saturatedFat, carbs, sugars, protein, sodium
  */
 export function extractNutrition(ocrResponse, apiConfig) {
   // If apiConfig is provided and has a key, call the AI API
@@ -40,7 +40,7 @@ async function callAIOcr(imageData, apiConfig) {
           content: [
             {
               type: 'text',
-              text: 'Extract nutritional information from this food label. Return only a JSON object with keys: energy (kcal/100g), fat (g/100g), saturatedFat (g/100g), carbs (g/100g), sugars (g/100g), protein (g/100g), salt (g/100g). Use 0 for missing values.'
+              text: 'Extract nutritional information from this food label. Return only a JSON object with keys: energy (kcal/100g), fat (g/100g), saturatedFat (g/100g), carbs (g/100g), sugars (g/100g), protein (g/100g), sodium (g/100g). Use 0 for missing values.'
             },
             {
               type: 'image_url',
@@ -105,7 +105,7 @@ function parseOcrText(text) {
   }
 
   // Parse sugars
-  const sugarsMatch = text.match(/(?:davon\s+Zucker|of\s+which\s+sugars|waarvan\s+suikers|dont\s+sucre|di\s+zuccheri)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:g|gram)/i);
+  const sugarsMatch = text.match(/(?:davon\s+Zucker|of\s+which\s+sugars|waarvan\s+suikers|dont\s+sucre|di\s+zuccheri|Sugar|Sugars)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:g|gram)?/i);
   if (sugarsMatch) {
     result.sugars = parseFloat(sugarsMatch[1].replace(',', '.')) || 0;
   }
@@ -116,10 +116,10 @@ function parseOcrText(text) {
     result.protein = parseFloat(proteinMatch[1].replace(',', '.')) || 0;
   }
 
-  // Parse salt (in grams)
-  const saltMatch = text.match(/(?:Salz|Salt|Zout|Sel|Sale)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:g|gram)/i);
-  if (saltMatch) {
-    result.salt = parseFloat(saltMatch[1].replace(',', '.')) || 0;
+  // Parse sodium
+  const sodiumMatch = text.match(/(?:Sodium|Salz|Sel|Zout|Sale)\s*[:\s]*\s*(\d[\d.,]*)\s*(?:g|gram)?/i);
+  if (sodiumMatch) {
+    result.sodium = parseFloat(sodiumMatch[1].replace(',', '.')) || 0;
   }
 
   return result;
@@ -137,6 +137,6 @@ function createZeroFilledNutrition() {
     carbs: 0,
     sugars: 0,
     protein: 0,
-    salt: 0
+    sodium: 0
   };
 }
