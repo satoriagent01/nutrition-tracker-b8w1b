@@ -1,98 +1,108 @@
 /**
- * localStorage-based persistence module.
- * All functions accept a storage object (default: window.localStorage)
- * to allow testing with mock storage.
+ * Storage module for persisting products, meals, and API configuration.
+ * Uses localStorage by default but accepts a custom storage interface.
  */
 
-const PRODUCTS_KEY = 'nutrition_tracker_products';
-const MEALS_KEY = 'nutrition_tracker_meals';
+const STORAGE_KEYS = {
+  PRODUCTS: 'nutrition_products',
+  MEALS: 'nutrition_meals',
+  API_KEY: 'nutrition_api_key',
+  API_URL: 'nutrition_api_url',
+  API_MODEL: 'nutrition_api_model'
+};
 
 /**
  * Saves a product to storage.
- * @param {object} product - Product object
- * @param {object} [storage] - Storage object (default: localStorage)
+ *
+ * @param {Object} product - Product object with name and nutritional data
+ * @param {Object} storage - Storage interface (default: localStorage)
  */
 export function saveProduct(product, storage = globalThis.localStorage) {
   if (!storage) return;
   const products = getProducts(storage);
-  const existingIndex = products.findIndex(p => p.id === product.id);
+  const existingIndex = products.findIndex(p => p.name === product.name);
   if (existingIndex >= 0) {
     products[existingIndex] = product;
   } else {
     products.push(product);
   }
-  storage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+  storage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
 }
 
 /**
- * Gets all products from storage.
- * @param {object} [storage] - Storage object (default: localStorage)
- * @returns {Array<object>} Array of products
+ * Retrieves all products from storage.
+ *
+ * @param {Object} storage - Storage interface (default: localStorage)
+ * @returns {Array} Array of product objects
  */
 export function getProducts(storage = globalThis.localStorage) {
   if (!storage) return [];
-  const data = storage.getItem(PRODUCTS_KEY);
+  const data = storage.getItem(STORAGE_KEYS.PRODUCTS);
   return data ? JSON.parse(data) : [];
 }
 
 /**
  * Saves a meal to storage.
- * @param {object} meal - Meal object
- * @param {object} [storage] - Storage object (default: localStorage)
+ *
+ * @param {Object} meal - Meal object with name and items
+ * @param {Object} storage - Storage interface (default: localStorage)
  */
 export function saveMeal(meal, storage = globalThis.localStorage) {
   if (!storage) return;
   const meals = getMeals(storage);
-  const existingIndex = meals.findIndex(m => m.id === meal.id);
+  const existingIndex = meals.findIndex(m => m.name === meal.name);
   if (existingIndex >= 0) {
     meals[existingIndex] = meal;
   } else {
     meals.push(meal);
   }
-  storage.setItem(MEALS_KEY, JSON.stringify(meals));
+  storage.setItem(STORAGE_KEYS.MEALS, JSON.stringify(meals));
 }
 
 /**
- * Gets all meals from storage.
- * @param {object} [storage] - Storage object (default: localStorage)
- * @returns {Array<object>} Array of meals
+ * Retrieves all meals from storage.
+ *
+ * @param {Object} storage - Storage interface (default: localStorage)
+ * @returns {Array} Array of meal objects
  */
 export function getMeals(storage = globalThis.localStorage) {
   if (!storage) return [];
-  const data = storage.getItem(MEALS_KEY);
+  const data = storage.getItem(STORAGE_KEYS.MEALS);
   return data ? JSON.parse(data) : [];
 }
 
 /**
  * Deletes a product by name.
- * @param {string} productName - Product name to delete
- * @param {object} [storage] - Storage object (default: localStorage)
+ *
+ * @param {string} name - Product name to delete
+ * @param {Object} storage - Storage interface (default: localStorage)
  */
-export function deleteProduct(productName, storage = globalThis.localStorage) {
+export function deleteProduct(name, storage = globalThis.localStorage) {
   if (!storage) return;
-  const products = getProducts(storage);
-  const filtered = products.filter(p => p.name !== productName);
-  storage.setItem(PRODUCTS_KEY, JSON.stringify(filtered));
+  const products = getProducts(storage).filter(p => p.name !== name);
+  storage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
 }
 
 /**
  * Deletes a meal by name.
- * @param {string} mealName - Meal name to delete
- * @param {object} [storage] - Storage object (default: localStorage)
+ *
+ * @param {string} name - Meal name to delete
+ * @param {Object} storage - Storage interface (default: localStorage)
  */
-export function deleteMeal(mealName, storage = globalThis.localStorage) {
+export function deleteMeal(name, storage = globalThis.localStorage) {
   if (!storage) return;
-  const meals = getMeals(storage);
-  const filtered = meals.filter(m => m.name !== mealName);
-  storage.setItem(MEALS_KEY, JSON.stringify(filtered));
+  const meals = getMeals(storage).filter(m => m.name !== name);
+  storage.setItem(STORAGE_KEYS.MEALS, JSON.stringify(meals));
 }
 
 /**
- * Exports all data as a JSON string.
- * @param {object} [storage] - Storage object (default: localStorage)
+ * Exports all data as JSON string.
+ *
+ * @param {Object} storage - Storage interface (default: localStorage)
  * @returns {string} JSON string of all data
  */
 export function exportData(storage = globalThis.localStorage) {
+  if (!storage) return '{}';
   return JSON.stringify({
     products: getProducts(storage),
     meals: getMeals(storage)
@@ -100,27 +110,102 @@ export function exportData(storage = globalThis.localStorage) {
 }
 
 /**
- * Imports data from a JSON string.
- * @param {string} data - JSON string of data
- * @param {object} [storage] - Storage object (default: localStorage)
+ * Imports data from JSON string.
+ *
+ * @param {string} json - JSON string of data
+ * @param {Object} storage - Storage interface (default: localStorage)
  */
-export function importData(data, storage = globalThis.localStorage) {
+export function importData(json, storage = globalThis.localStorage) {
   if (!storage) return;
-  const parsed = JSON.parse(data);
-  if (parsed.products) {
-    storage.setItem(PRODUCTS_KEY, JSON.stringify(parsed.products));
-  }
-  if (parsed.meals) {
-    storage.setItem(MEALS_KEY, JSON.stringify(parsed.meals));
+  try {
+    const data = JSON.parse(json);
+    if (data.products) {
+      storage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(data.products));
+    }
+    if (data.meals) {
+      storage.setItem(STORAGE_KEYS.MEALS, JSON.stringify(data.meals));
+    }
+  } catch (e) {
+    throw new Error('Invalid JSON data');
   }
 }
 
 /**
- * Clears all data from storage.
- * @param {object} [storage] - Storage object (default: localStorage)
+ * Clears all stored data.
+ *
+ * @param {Object} storage - Storage interface (default: localStorage)
  */
 export function clearData(storage = globalThis.localStorage) {
   if (!storage) return;
-  storage.removeItem(PRODUCTS_KEY);
-  storage.removeItem(MEALS_KEY);
+  storage.removeItem(STORAGE_KEYS.PRODUCTS);
+  storage.removeItem(STORAGE_KEYS.MEALS);
+  storage.removeItem(STORAGE_KEYS.API_KEY);
+  storage.removeItem(STORAGE_KEYS.API_URL);
+  storage.removeItem(STORAGE_KEYS.API_MODEL);
+}
+
+/**
+ * Saves the API key to storage.
+ *
+ * @param {string} key - The API key
+ * @param {Object} storage - Storage interface (default: localStorage)
+ */
+export function saveApiKey(key, storage = globalThis.localStorage) {
+  if (!storage) return;
+  storage.setItem(STORAGE_KEYS.API_KEY, key);
+}
+
+/**
+ * Retrieves the API key from storage.
+ *
+ * @param {Object} storage - Storage interface (default: localStorage)
+ * @returns {string|null} The API key or null
+ */
+export function getApiKey(storage = globalThis.localStorage) {
+  if (!storage) return null;
+  return storage.getItem(STORAGE_KEYS.API_KEY);
+}
+
+/**
+ * Saves the API URL to storage.
+ *
+ * @param {string} url - The API URL
+ * @param {Object} storage - Storage interface (default: localStorage)
+ */
+export function saveApiUrl(url, storage = globalThis.localStorage) {
+  if (!storage) return;
+  storage.setItem(STORAGE_KEYS.API_URL, url);
+}
+
+/**
+ * Retrieves the API URL from storage.
+ *
+ * @param {Object} storage - Storage interface (default: localStorage)
+ * @returns {string|null} The API URL or null
+ */
+export function getApiUrl(storage = globalThis.localStorage) {
+  if (!storage) return null;
+  return storage.getItem(STORAGE_KEYS.API_URL);
+}
+
+/**
+ * Saves the API model to storage.
+ *
+ * @param {string} model - The model name
+ * @param {Object} storage - Storage interface (default: localStorage)
+ */
+export function saveApiModel(model, storage = globalThis.localStorage) {
+  if (!storage) return;
+  storage.setItem(STORAGE_KEYS.API_MODEL, model);
+}
+
+/**
+ * Retrieves the API model from storage.
+ *
+ * @param {Object} storage - Storage interface (default: localStorage)
+ * @returns {string|null} The model name or null
+ */
+export function getApiModel(storage = globalThis.localStorage) {
+  if (!storage) return null;
+  return storage.getItem(STORAGE_KEYS.API_MODEL);
 }
