@@ -1,9 +1,8 @@
-import { test, describe } from "node:test";
+import { test, describe, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { saveProduct, getProducts, saveMeal, getMeals, deleteProduct, deleteMeal, exportData, importData } from "../src/storage.js";
 
 describe("storage", () => {
-  // Use a mock storage object instead of localStorage
   const createMockStorage = () => {
     const store = {};
     return {
@@ -13,7 +12,11 @@ describe("storage", () => {
     };
   };
 
-  const mockStorage = createMockStorage();
+  let mockStorage;
+
+  beforeEach(() => {
+    mockStorage = createMockStorage();
+  });
 
   test("AC-2: saves and retrieves a product", () => {
     const product = {
@@ -77,7 +80,6 @@ describe("storage", () => {
   });
 
   test("AC-2: returns empty array when no products stored", () => {
-    mockStorage.clear();
     const products = getProducts(mockStorage);
     assert.equal(products.length, 0);
   });
@@ -182,7 +184,6 @@ describe("storage", () => {
   });
 
   test("AC-5: returns empty array when no meals stored", () => {
-    mockStorage.clear();
     const meals = getMeals(mockStorage);
     assert.equal(meals.length, 0);
   });
