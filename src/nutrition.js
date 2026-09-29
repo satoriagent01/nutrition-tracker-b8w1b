@@ -13,13 +13,13 @@ export function calculateNutrition(product, grams) {
   const factor = grams / 100;
   const per100g = product.per100g || {};
   return {
-    energy: round(per100g.energy || 0, 2),
-    fat: round(per100g.fat || 0, 2),
-    saturatedFat: round(per100g.saturatedFat || 0, 2),
-    carbs: round(per100g.carbs || 0, 2),
-    sugars: round(per100g.sugars || 0, 2),
-    protein: round(per100g.protein || 0, 2),
-    sodium: round(per100g.sodium || 0, 3)
+    energy: round((per100g.energy || 0) * factor, 2),
+    fat: round((per100g.fat || 0) * factor, 2),
+    saturatedFat: round((per100g.saturatedFat || 0) * factor, 2),
+    carbs: round((per100g.carbs || 0) * factor, 2),
+    sugars: round((per100g.sugars || 0) * factor, 2),
+    protein: round((per100g.protein || 0) * factor, 2),
+    sodium: round((per100g.sodium || 0) * factor, 3)
   };
 }
 
