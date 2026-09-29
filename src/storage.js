@@ -1,79 +1,121 @@
 /**
- * Storage module for persisting products and meals.
- * Uses localStorage by default, but accepts a mock storage object for testing.
+ * Storage module for localStorage-based persistence.
+ * Provides abstraction over localStorage for products and meals.
  */
 
-const PRODUCTS_KEY = "nutrition-tracker-products";
-const MEALS_KEY = "nutrition-tracker-meals";
+const PRODUCTS_KEY = 'nutrition_tracker_products';
+const MEALS_KEY = 'nutrition_tracker_meals';
 
 /**
  * Saves a product to storage.
  *
- * @param {object} product - Product object with id, name, and nutritional values
- * @param {object} [storage] - Storage interface (defaults to localStorage)
+ * @param {Object} product - Product object to save
+ * @param {Object} storage - Storage interface (defaults to localStorage)
  */
-export function saveProduct(product, storage) {
-  const store = storage || localStorage;
-  const products = getProducts(store);
-  // Check if product already exists, update it
-  const existingIndex = products.findIndex((p) => p.id === product.id);
+export function saveProduct(product, storage = localStorage) {
+  if (!product || !product.name) {
+    throw new Error('Product must have a name');
+  }
+
+  const products = getProducts(storage);
+  const existingIndex = products.findIndex(p => p.name === product.name);
+
   if (existingIndex >= 0) {
     products[existingIndex] = product;
   } else {
     products.push(product);
   }
-  store.setItem(PRODUCTS_KEY, JSON.stringify(products));
+
+  storage.setItem(PRODUCTS_KEY, JSON.stringify(products));
 }
 
 /**
- * Retrieves all saved products.
+ * Retrieves all products from storage.
  *
- * @param {object} [storage] - Storage interface (defaults to localStorage)
- * @returns {Array<object>} Array of product objects
+ * @param {Object} storage - Storage interface (defaults to localStorage)
+ * @returns {Array<Object>} Array of product objects
  */
-export function getProducts(storage) {
-  const store = storage || localStorage;
-  const data = store.getItem(PRODUCTS_KEY);
-  if (!data) return [];
-  try {
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
+export function getProducts(storage = localStorage) {
+  const data = storage.getItem(PRODUCTS_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+/**
+ * Deletes a product from storage by name.
+ *
+ * @param {string} productName - Name of the product to delete
+ * @param {Object} storage - Storage interface (defaults to localStorage)
+ */
+export function deleteProduct(productName, storage = localStorage) {
+  const products = getProducts(storage);
+  const filtered = products.filter(p => p.name !== productName);
+  storage.setItem(PRODUCTS_KEY, JSON.stringify(filtered));
 }
 
 /**
  * Saves a meal to storage.
  *
- * @param {object} meal - Meal object with id, name, date, and items
- * @param {object} [storage] - Storage interface (defaults to localStorage)
+ * @param {Object} meal - Meal object to save
+ * @param {Object} storage - Storage interface (defaults to localStorage)
  */
-export function saveMeal(meal, storage) {
-  const store = storage || localStorage;
-  const meals = getMeals(store);
-  // Check if meal already exists, update it
-  const existingIndex = meals.findIndex((m) => m.id === meal.id);
-  if (existingIndex >= 0) {
-    meals[existingIndex] = meal;
-  } else {
-    meals.push(meal);
+export function saveMeal(meal, storage = localStorage) {
+  if (!meal || !meal.name) {
+    throw new Error('Meal must have a name');
   }
-  store.setItem(MEALS_KEY, JSON.stringify(meals));
+
+  const meals = getMeals(storage);
+  meals.push(meal);
+  storage.setItem(MEALS_KEY, JSON.stringify(meals));
 }
 
 /**
- * Retrieves all saved meals.
+ * Retrieves all meals from storage.
  *
- * @param {object} [storage] - Storage interface (defaults to localStorage)
- * @returns {Array<object>} Array of meal objects
+ * @param {Object} storage - Storage interface (defaults to localStorage)
+ * @returns {Array<Object>} Array of meal objects
  */
-export function getMeals(storage) {
-  const store = storage || localStorage;
-  const data = store.getItem(MEALS_KEY);
-  if (!data) return [];
-  try {
-    return JSON.parse(data);
-  } catch {
-    return [];
+export function getMeals(storage = localStorage) {
+  const data = storage.getItem(MEALS_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+/**
+ * Deletes a meal from storage by name.
+ *
+ * @param {string} mealName - Name of the meal to delete
+ * @param {Object} storage - Storage interface (defaults to localStorage)
+ */
+export function deleteMeal(mealName, storage = localStorage) {
+  const meals = getMeals(storage);
+  const filtered = meals.filter(m => m.name !== mealName);
+  storage.setItem(MEALS_KEY, JSON.stringify(filtered));
+}
+
+/**
+ * Exports all data (products and meals) as a JSON string.
+ *
+ * @param {Object} storage - Storage interface (defaults to localStorage)
+ * @returns {string} JSON string of all data
+ */
+export function exportData(storage = localStorage) {
+  return JSON.stringify({
+    products: getProducts(storage),
+    meals: getMeals(storage)
+  }, null, 2);
+}
+
+/**
+ * Imports data from a JSON string.
+ *
+ * @param {string} data - JSON string of data to import
+ * @param {Object} storage - Storage interface (defaults to localStorage)
+ */
+export function importData(data, storage = localStorage) {
+  const parsed = JSON.parse(data);
+  if (parsed.products) {
+    storage.setItem(PRODUCTS_KEY, JSON.stringify(parsed.products));
+  }
+  if (parsed.meals) {
+    storage.setItem(MEALS_KEY, JSON.stringify(parsed.meals));
   }
 }
