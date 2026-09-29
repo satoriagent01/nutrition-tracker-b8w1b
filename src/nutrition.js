@@ -42,15 +42,14 @@ export function sumNutrition(items) {
   };
 
   for (const item of items) {
-    if (item.nutrition) {
-      result.energy += item.nutrition.energy || 0;
-      result.fat += item.nutrition.fat || 0;
-      result.saturatedFat += item.nutrition.saturatedFat || 0;
-      result.carbs += item.nutrition.carbs || 0;
-      result.sugars += item.nutrition.sugars || 0;
-      result.protein += item.nutrition.protein || 0;
-      result.sodium += item.nutrition.sodium || 0;
-    }
+    const nutrition = item.nutrition || {};
+    result.energy += nutrition.energy || 0;
+    result.fat += nutrition.fat || 0;
+    result.saturatedFat += nutrition.saturatedFat || 0;
+    result.carbs += nutrition.carbs || 0;
+    result.sugars += nutrition.sugars || 0;
+    result.protein += nutrition.protein || 0;
+    result.sodium += nutrition.sodium || 0;
   }
 
   // Round all values to 2 decimal places
