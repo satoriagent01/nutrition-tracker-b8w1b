@@ -6,7 +6,7 @@
   <title>Nutrition Tracker</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+    body { font-family: -apple-system, BlinkMacFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
     .container { max-width: 900px; margin: 0 auto; padding: 20px; }
     h1 { text-align: center; margin-bottom: 30px; color: #2c3e50; }
     h2 { margin-bottom: 15px; color: #34495e; }
@@ -17,6 +17,7 @@
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     button { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
     button:hover { background: #2980b9; }
+    button:disabled { background: #95a5a6; cursor: not-allowed; }
     .delete-btn { background: #e74c3c; padding: 5px 10px; font-size: 12px; }
     .delete-btn:hover { background: #c0392b; }
     .product-item, .meal-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
@@ -33,6 +34,9 @@
     #fileInput { display: none; }
     .success { color: #27ae60; }
     .error { color: #e74c3c; }
+    .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px; vertical-align: middle; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .processing { color: #3498db; font-weight: 500; }
   </style>
 </head>
 <body>
@@ -202,18 +206,23 @@
         const apiKey = getApiKey();
         const apiModel = getApiModel();
 
-        if (apiUrl && apiKey) {
-          try {
-            const result = await extractNutrition(imageData, { url: apiUrl, key: apiKey, model: apiModel });
-            displayOcrResult(result);
-          } catch (err) {
-            document.getElementById('ocrResult').innerHTML = `<p class="error">Error: ${err.message}</p>`;
-            document.getElementById('ocrResult').style.display = 'block';
+        // Show loading indicator
+        const ocrResult = document.getElementById('ocrResult');
+        ocrResult.innerHTML = '<p class="processing"><span class="loading"></span>Processing image...</p>';
+        ocrResult.style.display = 'block';
+
+        try {
+          let result;
+          if (apiUrl && apiKey) {
+            result = await extractNutrition(imageData, { url: apiUrl, key: apiKey, model: apiModel });
+          } else {
+            // Mock mode - no API config
+            result = await extractNutrition(imageData);
           }
-        } else {
-          // Mock mode
-          const result = extractNutrition(imageData);
           displayOcrResult(result);
+        } catch (err) {
+          ocrResult.innerHTML = `<p class="error">Error: ${err.message}</p>`;
+          ocrResult.style.display = 'block';
         }
       };
       reader.readAsDataURL(file);
